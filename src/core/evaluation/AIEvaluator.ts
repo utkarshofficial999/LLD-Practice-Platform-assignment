@@ -6,37 +6,174 @@ import { RubricAssessment } from '../domain/Feedback.ts';
 export class AIEvaluator implements IEvaluationStrategy {
   public readonly name = 'AI Architectural Judgment Evaluator';
 
-  constructor(private readonly apiKey?: string) {}
+  private readonly groqApiKey?: string;
+  private readonly openaiApiKey?: string;
+
+  constructor(groqApiKey?: string, openaiApiKey?: string) {
+    this.groqApiKey = groqApiKey;
+    this.openaiApiKey = openaiApiKey;
+  }
 
   public async evaluate(submission: Submission, problem: Problem): Promise<StageEvaluationResult> {
     const classSkeleton = submission.content.getClassSkeleton();
     const rationale = submission.content.getRationale();
     const structuralModel = submission.content.extractStructuralModel();
 
-    // If an external Gemini/OpenAI API key is present, attempt live inference with timeout
-    if (this.apiKey) {
+    // Try Groq API first (fast inference)
+    if (this.groqApiKey) {
       try {
-        const liveAssessments = await this.callLiveLLM(classSkeleton, rationale, problem);
+        const liveAssessments = await this.callGroqAPI(classSkeleton, rationale, problem);
         if (liveAssessments && liveAssessments.length > 0) {
           return {
-            stageName: this.name,
+            stageName: this.name + ' (Groq LLM)',
             success: true,
             rubricAssessments: liveAssessments,
           };
         }
       } catch (err) {
-        console.warn('Live LLM evaluation timed out or encountered an error. Falling back to local semantic evaluator.', err);
+        console.warn('Groq LLM evaluation failed. Falling back to local evaluator.', err);
       }
     }
 
-    // High-fidelity local semantic reasoning evaluator
+    // Fallback: High-fidelity local semantic reasoning evaluator
     const assessments = this.evaluateLocally(classSkeleton, rationale, structuralModel, problem);
 
     return {
-      stageName: this.name,
+      stageName: this.name + ' (Local)',
       success: true,
       rubricAssessments: assessments,
     };
+  }
+
+  /**
+   * Calls the Groq API with a structured rubric prompt.
+   * Uses Llama 3 model for fast, high-quality inference.
+   */
+  private async callGroqAPI(
+    classSkeleton: string,
+    rationale: string,
+    problem: Problem
+  ): Promise<RubricAssessment[]> {
+    const systemPrompt = `You are a senior software architect evaluating a Low-Level Design (LLD) submission.
+You MUST respond with ONLY a valid JSON array. No markdown, no explanation, just the JSON array.
+
+The submission is for: "${problem.title}"
+Required domain entities: ${problem.requiredEntities.join(', ')}
+
+Evaluate across exactly 5 criteria. For each criterion, output a JSON object with these exact fields:
+- "criterion": string (the criterion name)
+- "score": number (1 to 5, where 5 is exceptional)
+- "evidence": string (specific evidence from the submission supporting your rating)
+- "concern": string (specific weakness or gap identified)
+- "suggestion": string (actionable improvement advice for the next attempt)
+- "confidence": number (0.0 to 1.0, your confidence in this assessment)
+
+The 5 criteria are:
+1. "Requirement Coverage & Domain Completeness"
+2. "Single Responsibility & Cohesion"
+3. "Coupling & Abstraction (SOLID)"
+4. "Extensibility & Pattern Appropriateness"
+5. "Quality of Reasoning & Trade-off Awareness"
+
+IMPORTANT: Ground every score in specific evidence from the candidate's code and rationale. Never give generic praise. Cite class names, method signatures, or rationale statements.`;
+
+    const userPrompt = `=== CLASS SKELETON ===
+${classSkeleton.substring(0, 4000)}
+
+=== DESIGN RATIONALE ===
+${rationale.substring(0, 2000)}
+
+Respond with ONLY the JSON array of 5 rubric assessments:`;
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+
+    try {
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.groqApiKey}`,
+        },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt },
+          ],
+          temperature: 0.3,
+          max_tokens: 2000,
+          response_format: { type: 'json_object' },
+        }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeout);
+
+      if (!response.ok) {
+        const errBody = await response.text();
+        throw new Error(`Groq API error ${response.status}: ${errBody}`);
+      }
+
+      const data = await response.json();
+      const content = data.choices?.[0]?.message?.content;
+
+      if (!content) {
+        throw new Error('Empty response from Groq API');
+      }
+
+      // Parse the JSON response
+      let parsed: any;
+      try {
+        parsed = JSON.parse(content);
+      } catch {
+        // Try extracting JSON array from the response
+        const arrayMatch = content.match(/\[[\s\S]*\]/);
+        if (arrayMatch) {
+          parsed = JSON.parse(arrayMatch[0]);
+        } else {
+          throw new Error('Could not parse Groq response as JSON');
+        }
+      }
+
+      // Handle both direct arrays and { assessments: [...] } shapes
+      const assessments: RubricAssessment[] = Array.isArray(parsed)
+        ? parsed
+        : Array.isArray(parsed.assessments)
+        ? parsed.assessments
+        : Array.isArray(parsed.rubric_assessments)
+        ? parsed.rubric_assessments
+        : [];
+
+      // Validate and sanitize
+      const validAssessments = assessments
+        .filter(
+          (a: any) =>
+            a.criterion &&
+            typeof a.score === 'number' &&
+            a.score >= 1 &&
+            a.score <= 5 &&
+            a.evidence &&
+            a.suggestion
+        )
+        .map((a: any) => ({
+          criterion: String(a.criterion),
+          score: Math.min(5, Math.max(1, Math.round(a.score))),
+          evidence: String(a.evidence),
+          concern: String(a.concern || 'None identified.'),
+          suggestion: String(a.suggestion),
+          confidence: typeof a.confidence === 'number' ? a.confidence : 0.85,
+        }));
+
+      if (validAssessments.length < 3) {
+        throw new Error(`Only ${validAssessments.length} valid assessments returned`);
+      }
+
+      return validAssessments;
+    } catch (err: any) {
+      clearTimeout(timeout);
+      throw err;
+    }
   }
 
   /**
@@ -226,15 +363,5 @@ export class AIEvaluator implements IEvaluationStrategy {
     });
 
     return assessments;
-  }
-
-  private async callLiveLLM(
-    classSkeleton: string,
-    rationale: string,
-    problem: Problem
-  ): Promise<RubricAssessment[] | null> {
-    // Scaffold for live Gemini / OpenAI calls with structured JSON output
-    // Returns null if network fails or timeout elapses
-    return null;
   }
 }

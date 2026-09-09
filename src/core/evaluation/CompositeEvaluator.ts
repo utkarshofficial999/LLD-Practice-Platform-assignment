@@ -15,7 +15,7 @@ export class CompositeEvaluator {
       // Default pipeline: Deterministic checks first, then AI qualitative judgment
       this.strategies = [
         new DeterministicEvaluator(),
-        new AIEvaluator(process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY),
+        new AIEvaluator(process.env.GROQ_API_KEY, process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY),
       ];
     }
   }
