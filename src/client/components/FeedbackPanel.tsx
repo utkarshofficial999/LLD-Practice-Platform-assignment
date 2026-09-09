@@ -1,5 +1,5 @@
 import React from 'react';
-import { Award, AlertTriangle, CheckCircle, ArrowRight, Lightbulb, Star, ShieldAlert, RotateCcw } from 'lucide-react';
+import { Award, AlertTriangle, CheckCircle, ArrowRight, Lightbulb, Star, ShieldAlert, RotateCcw, Sparkles } from 'lucide-react';
 
 interface RubricAssessment {
   criterion: string;
@@ -52,14 +52,21 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
             <ShieldAlert size={16} /> Evaluation Failed
           </div>
         </div>
-        <div className="pane-content" style={{ textAlign: 'center', paddingTop: '40px' }}>
-          <AlertTriangle size={40} style={{ color: '#fb7185', margin: '0 auto 16px' }} />
-          <h3 style={{ marginBottom: '8px' }}>Evaluation Stopped</h3>
-          <p style={{ fontSize: '0.85rem', color: '#94a3b8', marginBottom: '20px' }}>
-            {errorDiagnostic || 'An error occurred during evaluation.'}
+        <div className="pane-content" style={{ textAlign: 'center', paddingTop: '60px' }}>
+          <div style={{
+            width: 60, height: 60, borderRadius: 'var(--radius-lg)',
+            background: 'rgba(244, 63, 94, 0.1)', border: '1px solid rgba(244, 63, 94, 0.25)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 20px', boxShadow: '0 0 24px rgba(244, 63, 94, 0.15)'
+          }}>
+            <AlertTriangle size={28} style={{ color: '#fb7185' }} />
+          </div>
+          <h3 style={{ marginBottom: '8px', fontSize: '1.05rem' }}>Evaluation Stopped</h3>
+          <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', marginBottom: '24px', maxWidth: 320, margin: '0 auto 24px' }}>
+            {errorDiagnostic || 'An unexpected error occurred during design evaluation.'}
           </p>
           <button id="retry-eval-btn" className="header-btn primary" onClick={onRetry}>
-            <RotateCcw size={16} /> Retry Evaluation
+            <RotateCcw size={15} /> Retry Evaluation
           </button>
         </div>
       </div>
@@ -73,8 +80,13 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
           <Award size={16} /> Explainable Feedback
         </div>
         {evaluation && (
-          <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
-            Version {evaluation.version} ({evaluation.evaluationSource})
+          <span style={{
+            fontSize: '0.72rem', color: 'var(--text-dim)',
+            fontWeight: 600, padding: '3px 8px',
+            background: 'rgba(255,255,255,0.04)', borderRadius: 'var(--radius-full)',
+            border: '1px solid var(--border-color)'
+          }}>
+            v{evaluation.version} • {evaluation.evaluationSource}
           </span>
         )}
       </div>
@@ -84,120 +96,103 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
         <div className="pipeline-stepper">
           <div className={`step-item ${submissionStatus ? 'completed' : ''}`}>
             <div className="step-dot" />
-            <span>Submitted</span>
+            <span>Saved</span>
           </div>
-          <div
-            className={`step-item ${
-              isEvaluating ? 'active' : evaluation ? 'completed' : ''
-            }`}
-          >
+          <div className={`step-item ${isEvaluating ? 'active' : evaluation ? 'completed' : ''}`}>
             <div className="step-dot" />
-            <span>Deterministic</span>
+            <span>Static</span>
           </div>
-          <div
-            className={`step-item ${
-              isEvaluating ? 'active' : evaluation ? 'completed' : ''
-            }`}
-          >
+          <div className={`step-item ${isEvaluating ? 'active' : evaluation ? 'completed' : ''}`}>
             <div className="step-dot" />
-            <span>AI Reasoning</span>
+            <span>AI Rubric</span>
           </div>
           <div className={`step-item ${evaluation ? 'completed' : ''}`}>
             <div className="step-dot" />
-            <span>Scorecard</span>
+            <span>Done</span>
           </div>
         </div>
 
+        {/* Empty state */}
         {!evaluation && !isEvaluating && (
-          <div style={{ textAlign: 'center', padding: '60px 20px', color: '#64748b' }}>
-            <Lightbulb size={36} style={{ margin: '0 auto 12px', opacity: 0.6 }} />
-            <h4 style={{ color: '#cbd5e1', marginBottom: '6px' }}>Ready for Evaluation</h4>
-            <p style={{ fontSize: '0.84rem' }}>
-              Submit your class skeleton and design rationale to receive multi-dimensional rubric feedback and anti-pattern analysis.
+          <div style={{ textAlign: 'center', padding: '50px 20px', color: 'var(--text-dim)' }}>
+            <div style={{
+              width: 64, height: 64, borderRadius: 'var(--radius-lg)',
+              background: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.2)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              margin: '0 auto 18px', boxShadow: '0 0 24px rgba(99, 102, 241, 0.1)'
+            }}>
+              <Sparkles size={26} style={{ color: '#818cf8', opacity: 0.7 }} />
+            </div>
+            <h4 style={{ color: 'var(--text-secondary)', marginBottom: '8px', fontSize: '1rem' }}>Ready for Evaluation</h4>
+            <p style={{ fontSize: '0.84rem', maxWidth: 320, margin: '0 auto', lineHeight: 1.6 }}>
+              Submit your class skeleton and design rationale to receive structured rubric feedback with evidence-based suggestions.
             </p>
           </div>
         )}
 
+        {/* Loading state */}
         {isEvaluating && (
-          <div style={{ textAlign: 'center', padding: '60px 20px', color: '#64748b' }}>
-            <div
-              style={{
-                width: '40px',
-                height: '40px',
-                border: '3px solid rgba(99, 102, 241, 0.2)',
-                borderTopColor: '#6366f1',
-                borderRadius: '50%',
-                margin: '0 auto 16px',
-                animation: 'spin 1s linear infinite',
-              }}
-            />
-            <h4 style={{ color: '#cbd5e1', marginBottom: '6px' }}>Evaluating Low-Level Design</h4>
-            <p style={{ fontSize: '0.82rem', color: '#94a3b8' }}>
-              Running static structural analysis, checking entity coverage, and generating rubric ratings...
+          <div style={{ textAlign: 'center', padding: '50px 20px' }}>
+            <div style={{
+              width: 48, height: 48, margin: '0 auto 20px',
+              border: '3px solid rgba(99, 102, 241, 0.15)',
+              borderTopColor: '#818cf8',
+              borderRadius: '50%',
+              animation: 'spin 0.8s linear infinite',
+              boxShadow: '0 0 20px rgba(99, 102, 241, 0.15)',
+            }} />
+            <h4 style={{ color: 'var(--text-secondary)', marginBottom: '6px' }}>Analyzing Design</h4>
+            <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', maxWidth: 300, margin: '0 auto' }}>
+              Running structural analysis, checking entity coverage, and generating rubric assessments...
             </p>
           </div>
         )}
 
         {evaluation && (
           <>
-            {/* Score Hero Card */}
+            {/* 3D Score Hero Card */}
             <div className="score-hero-card">
               <div>
-                <div style={{ fontSize: '0.78rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>
-                  Design Quality Score
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.06em' }}>
+                  Design Quality
                 </div>
                 <div className="score-number">{evaluation.overallScore}%</div>
-                <div
-                  className={`score-badge ${
-                    evaluation.overallScore >= 80 ? 'high' : evaluation.overallScore >= 60 ? 'medium' : 'low'
-                  }`}
-                >
-                  {evaluation.overallScore >= 80
-                    ? 'Production Ready'
-                    : evaluation.overallScore >= 60
-                    ? 'Competent Structure'
-                    : 'Needs Refactoring'}
+                <div className={`score-badge ${
+                  evaluation.overallScore >= 80 ? 'high' : evaluation.overallScore >= 60 ? 'medium' : 'low'
+                }`}>
+                  {evaluation.overallScore >= 80 ? '✦ Production Ready'
+                    : evaluation.overallScore >= 60 ? '◉ Competent Structure'
+                    : '◌ Needs Refactoring'}
                 </div>
               </div>
 
-              <button
-                id="try-again-btn"
-                className="header-btn primary"
-                onClick={onTryAgain}
-                style={{ alignSelf: 'center' }}
-              >
-                <RotateCcw size={14} /> Try Again (Next Attempt)
+              <button id="try-again-btn" className="header-btn primary" onClick={onTryAgain} style={{ alignSelf: 'center' }}>
+                <RotateCcw size={14} /> Next Attempt
               </button>
             </div>
 
-            {/* Actionable Summary Banner */}
+            {/* Actionable Next Steps */}
             {evaluation.actionableSummary.length > 0 && (
-              <div
-                style={{
-                  background: 'rgba(99, 102, 241, 0.08)',
-                  border: '1px solid rgba(99, 102, 241, 0.25)',
-                  borderRadius: 'var(--radius-md)',
-                  padding: '12px 14px',
-                  marginBottom: '18px',
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: '0.8rem',
-                    fontWeight: 700,
-                    color: '#a5b4fc',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    marginBottom: '6px',
-                  }}
-                >
-                  <Lightbulb size={14} /> Recommended Next Steps
+              <div style={{
+                background: 'rgba(99, 102, 241, 0.06)',
+                border: '1px solid rgba(99, 102, 241, 0.2)',
+                borderRadius: 'var(--radius-md)',
+                padding: '14px 16px',
+                marginBottom: '20px',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.03)',
+                animation: 'fade-in-up 0.3s ease-out',
+              }}>
+                <div style={{
+                  fontSize: '0.76rem', fontWeight: 700, color: '#a5b4fc',
+                  display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px',
+                  textTransform: 'uppercase', letterSpacing: '0.05em'
+                }}>
+                  <Lightbulb size={13} /> Improvement Priorities
                 </div>
-                <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '7px' }}>
                   {evaluation.actionableSummary.map((item, idx) => (
-                    <li key={idx} style={{ fontSize: '0.78rem', color: '#cbd5e1', display: 'flex', gap: '6px' }}>
-                      <ArrowRight size={13} style={{ color: '#818cf8', flexShrink: 0, marginTop: '2px' }} />
+                    <li key={idx} style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', display: 'flex', gap: '8px', lineHeight: 1.5 }}>
+                      <ArrowRight size={13} style={{ color: '#818cf8', flexShrink: 0, marginTop: '3px' }} />
                       <span>{item}</span>
                     </li>
                   ))}
@@ -207,39 +202,32 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
 
             {/* Anti-Pattern Alerts */}
             {evaluation.deterministicFindings.antiPatternFlags.length > 0 && (
-              <div style={{ marginBottom: '18px' }}>
-                <div className="section-label">Design Smells & Anti-Patterns</div>
+              <div style={{ marginBottom: '20px' }}>
+                <div className="section-label">Design Smells Detected</div>
                 {evaluation.deterministicFindings.antiPatternFlags.map((flag, idx) => (
-                  <div
-                    key={idx}
-                    style={{
-                      background: flag.severity === 'critical' ? 'rgba(244, 63, 94, 0.08)' : 'rgba(245, 158, 11, 0.08)',
-                      border: `1px solid ${flag.severity === 'critical' ? 'rgba(244, 63, 94, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`,
-                      borderRadius: 'var(--radius-sm)',
-                      padding: '10px 12px',
-                      marginBottom: '8px',
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: '0.82rem',
-                        fontWeight: 700,
-                        color: flag.severity === 'critical' ? '#fb7185' : '#fbbf24',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        marginBottom: '4px',
-                      }}
-                    >
+                  <div key={idx} style={{
+                    background: flag.severity === 'critical' ? 'rgba(244, 63, 94, 0.06)' : 'rgba(245, 158, 11, 0.06)',
+                    border: `1px solid ${flag.severity === 'critical' ? 'rgba(244, 63, 94, 0.25)' : 'rgba(245, 158, 11, 0.25)'}`,
+                    borderRadius: 'var(--radius-sm)',
+                    padding: '12px 14px',
+                    marginBottom: '8px',
+                    boxShadow: 'var(--shadow-subtle)',
+                    animation: `fade-in-up 0.3s ease-out ${0.1 + idx * 0.05}s both`,
+                  }}>
+                    <div style={{
+                      fontSize: '0.8rem', fontWeight: 700,
+                      color: flag.severity === 'critical' ? '#fda4af' : '#fcd34d',
+                      display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '5px',
+                    }}>
                       <AlertTriangle size={14} /> {flag.name}
                     </div>
-                    <div style={{ fontSize: '0.78rem', color: '#cbd5e1' }}>{flag.details}</div>
+                    <div style={{ fontSize: '0.77rem', color: 'var(--text-secondary)', lineHeight: 1.55 }}>{flag.details}</div>
                   </div>
                 ))}
               </div>
             )}
 
-            {/* Rubric Criteria Breakdown */}
+            {/* Rubric Breakdown — 3D cards */}
             <div className="section-label">Structured Rubric Assessment</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {evaluation.rubricAssessments.map((item, idx) => (
@@ -251,11 +239,12 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                         <Star
                           key={i}
                           size={13}
-                          fill={i < item.score ? '#f59e0b' : 'transparent'}
-                          color={i < item.score ? '#f59e0b' : '#64748b'}
+                          fill={i < item.score ? '#fbbf24' : 'transparent'}
+                          color={i < item.score ? '#fbbf24' : 'rgba(255,255,255,0.12)'}
+                          style={{ filter: i < item.score ? 'drop-shadow(0 0 4px rgba(251, 191, 36, 0.3))' : 'none' }}
                         />
                       ))}
-                      <span style={{ marginLeft: '4px', color: '#f59e0b' }}>{item.score}/5</span>
+                      <span style={{ marginLeft: '6px', color: '#fbbf24', fontSize: '0.8rem' }}>{item.score}/5</span>
                     </div>
                   </div>
 

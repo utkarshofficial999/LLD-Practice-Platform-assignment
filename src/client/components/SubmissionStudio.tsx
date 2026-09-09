@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Code, GitFork, MessageSquare, Send, Loader2 } from 'lucide-react';
+import { Code, GitFork, MessageSquare, Send, Loader2, Braces } from 'lucide-react';
 import { MermaidViewer } from './MermaidViewer.tsx';
 
 interface SubmissionStudioProps {
@@ -25,8 +25,11 @@ export const SubmissionStudio: React.FC<SubmissionStudioProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'code' | 'diagram' | 'rationale'>('code');
 
+  const codeLines = classSkeleton.split('\n').length;
+  const wordCount = designRationale.trim().split(/\s+/).filter(Boolean).length;
+
   return (
-    <div className="pane" id="studio-pane" style={{ borderRight: '1px solid var(--border-color)' }}>
+    <div className="pane" id="studio-pane">
       <div className="pane-header">
         <div className="studio-tabs">
           <button
@@ -34,30 +37,37 @@ export const SubmissionStudio: React.FC<SubmissionStudioProps> = ({
             className={`studio-tab-btn ${activeTab === 'code' ? 'active' : ''}`}
             onClick={() => setActiveTab('code')}
           >
-            <Code size={14} /> Class Skeleton
+            <Code size={13} /> Code
           </button>
           <button
             id="tab-diagram-btn"
             className={`studio-tab-btn ${activeTab === 'diagram' ? 'active' : ''}`}
             onClick={() => setActiveTab('diagram')}
           >
-            <GitFork size={14} /> Live UML Diagram
+            <GitFork size={13} /> UML Diagram
           </button>
           <button
             id="tab-rationale-btn"
             className={`studio-tab-btn ${activeTab === 'rationale' ? 'active' : ''}`}
             onClick={() => setActiveTab('rationale')}
           >
-            <MessageSquare size={14} /> Architectural Rationale
+            <MessageSquare size={13} /> Rationale
           </button>
         </div>
 
-        <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)', fontFamily: 'monospace' }}>
-          TypeScript / UML
+        <div style={{
+          fontSize: '0.72rem',
+          color: 'var(--text-dim)',
+          fontFamily: 'var(--font-mono)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '4px'
+        }}>
+          <Braces size={12} /> TypeScript / UML
         </div>
       </div>
 
-      <div className="pane-content" style={{ display: 'flex', flexDirection: 'column', padding: '12px' }}>
+      <div className="pane-content" style={{ display: 'flex', flexDirection: 'column', padding: '14px' }}>
         {activeTab === 'code' && (
           <textarea
             id="skeleton-textarea"
@@ -70,7 +80,7 @@ export const SubmissionStudio: React.FC<SubmissionStudioProps> = ({
         )}
 
         {activeTab === 'diagram' && (
-          <div style={{ display: 'grid', gridTemplateRows: '1fr 1fr', gap: '12px', height: '100%' }}>
+          <div style={{ display: 'grid', gridTemplateRows: '1fr 1fr', gap: '10px', height: '100%' }}>
             <textarea
               id="diagram-textarea"
               className="editor-textarea"
@@ -86,10 +96,18 @@ export const SubmissionStudio: React.FC<SubmissionStudioProps> = ({
         )}
 
         {activeTab === 'rationale' && (
-          <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '8px' }}>
-            <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
-              💡 Explain your design decisions: <strong>Assumptions</strong>, <strong>Chosen Patterns</strong>, 
-              <strong> Trade-offs considered</strong>, and <strong>Concurrency handling</strong>.
+          <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '10px' }}>
+            <div style={{
+              fontSize: '0.78rem',
+              color: 'var(--text-muted)',
+              padding: '10px 14px',
+              background: 'rgba(99, 102, 241, 0.05)',
+              border: '1px solid rgba(99, 102, 241, 0.15)',
+              borderRadius: 'var(--radius-sm)',
+              lineHeight: 1.55,
+            }}>
+              💡 Explain: <strong>Assumptions</strong>, <strong>Chosen Patterns</strong>,
+              <strong> Trade-offs</strong>, and <strong>Concurrency handling</strong>.
             </div>
             <textarea
               id="rationale-textarea"
@@ -104,10 +122,10 @@ export const SubmissionStudio: React.FC<SubmissionStudioProps> = ({
       </div>
 
       <div className="studio-footer">
-        <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>
-          {activeTab === 'code' && `${classSkeleton.split('\n').length} lines of code`}
-          {activeTab === 'diagram' && 'Live Mermaid rendering'}
-          {activeTab === 'rationale' && `${designRationale.trim().split(/\s+/).filter(Boolean).length} words`}
+        <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)', display: 'flex', gap: '16px' }}>
+          {activeTab === 'code' && <span>{codeLines} lines</span>}
+          {activeTab === 'diagram' && <span>Live preview</span>}
+          {activeTab === 'rationale' && <span>{wordCount} words</span>}
         </div>
 
         <button
@@ -115,15 +133,20 @@ export const SubmissionStudio: React.FC<SubmissionStudioProps> = ({
           className="header-btn primary"
           onClick={onSubmit}
           disabled={isEvaluating}
-          style={{ opacity: isEvaluating ? 0.7 : 1, cursor: isEvaluating ? 'not-allowed' : 'pointer' }}
+          style={{
+            opacity: isEvaluating ? 0.7 : 1,
+            cursor: isEvaluating ? 'not-allowed' : 'pointer',
+            minWidth: 180,
+            justifyContent: 'center',
+          }}
         >
           {isEvaluating ? (
             <>
-              <Loader2 size={16} className="animate-spin" /> Evaluating Design...
+              <Loader2 size={15} className="animate-spin" /> Evaluating...
             </>
           ) : (
             <>
-              <Send size={16} /> Submit for Evaluation
+              <Send size={15} /> Submit for Evaluation
             </>
           )}
         </button>

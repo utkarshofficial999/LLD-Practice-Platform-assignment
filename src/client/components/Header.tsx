@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layers, History, Sparkles, RefreshCw } from 'lucide-react';
+import { Layers, History, Sparkles, RefreshCw, Zap } from 'lucide-react';
 
 interface HeaderProps {
   problems: { id: string; title: string; difficulty: string }[];
@@ -24,12 +24,15 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="app-header">
       <div className="brand-section">
         <div className="brand-logo">
-          <Layers size={22} />
+          <Layers size={20} strokeWidth={2.5} />
         </div>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span className="brand-title">LLD Studio</span>
-            <span className="brand-badge">Practice & Eval</span>
+            <span className="brand-badge">
+              <Zap size={10} style={{ marginRight: '2px', display: 'inline' }} />
+              Practice & Eval
+            </span>
           </div>
         </div>
       </div>
@@ -51,16 +54,18 @@ export const Header: React.FC<HeaderProps> = ({
         {currentVersion > 0 && (
           <div
             style={{
-              fontSize: '0.85rem',
+              fontSize: '0.82rem',
               fontWeight: 700,
-              padding: '6px 12px',
+              padding: '7px 14px',
               borderRadius: 'var(--radius-md)',
-              background: 'rgba(99, 102, 241, 0.15)',
-              color: '#a5b4fc',
-              border: '1px solid rgba(99, 102, 241, 0.3)',
+              background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.12))',
+              color: '#c4b5fd',
+              border: '1px solid rgba(139, 92, 246, 0.3)',
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
+              boxShadow: '0 0 16px rgba(139, 92, 246, 0.1), inset 0 1px 0 rgba(255,255,255,0.05)',
+              letterSpacing: '-0.01em',
             }}
           >
             <Sparkles size={14} /> Attempt #{currentVersion}
@@ -74,7 +79,7 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={onOpenComparison}
             title="Compare your attempts side-by-side"
           >
-            <History size={15} /> Compare Attempts
+            <History size={14} /> Compare
           </button>
         )}
 
@@ -84,7 +89,7 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={onReset}
           title="Reset to starter template"
         >
-          <RefreshCw size={15} /> Clean Template
+          <RefreshCw size={14} /> Reset
         </button>
       </div>
     </header>
