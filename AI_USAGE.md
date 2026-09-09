@@ -1,0 +1,60 @@
+# AI Usage Note: Engineering Decisions & Trade-offs
+
+This document details 4 meaningful AI-assisted decisions during the design and development of the **LLD Practice Platform**, reflecting the balance between AI suggestions, architectural scrutiny, and practical engineering judgement.
+
+---
+
+### Decision 1: Submission Modality — Code Execution vs Structured Skeleton + Rationale
+
+- **What the AI Suggested**:
+  - The AI initially suggested building a full WebAssembly / Docker-based code sandbox where learners write runnable TypeScript/Java code, execute automated unit tests, and measure runtime performance.
+- **What was Accepted vs. Rejected**:
+  - **Rejected**: Docker / Sandboxed code execution.
+  - **Accepted**: A **Structured Design Model** consisting of an interface/class skeleton, a live visual Mermaid class diagram, and an architectural design rationale.
+- **Why (Engineering Judgement)**:
+  - Sandboxed code execution tests *algorithmic correctness and syntax*, not *object-oriented design quality*. In an LLD interview, no one expects 400 lines of runnable getters, setters, and SQL queries.
+  - Furthermore, requiring compilation forces learners to spend 80% of their time debugging compiler type errors rather than thinking about responsibilities, coupling, and design patterns.
+  - The structured skeleton + rationale provides maximum evidence of design trade-offs with minimal friction, directly fulfilling Section 4 of the Candidate Helping Guide.
+
+---
+
+### Decision 2: Feedback Generation — Open-Ended 0–100 Score vs Fixed Structured Rubric
+
+- **What the AI Suggested**:
+  - Prompting an LLM with: *"You are an LLD interview expert. Review this student design, rate it from 0 to 100, and write feedback on what they did well and poorly."*
+- **What was Accepted vs. Rejected**:
+  - **Rejected**: Unconstrained 0–100 scoring and free-form feedback generation.
+  - **Accepted**: A **Fixed Rubric Schema** requiring the model to emit a strict JSON shape per criterion:
+    `{ criterion, score (1-5), evidence, concern, suggestion, confidence }`.
+- **Why (Engineering Judgement)**:
+  - Free-form scores from LLMs are notoriously noisy and drift between identical submissions.
+  - Forcing the model to produce **specific citations of evidence** from the candidate's submission grounds the evaluation in reality and prevents generic hallucinations like "Add Factory Pattern" when not relevant.
+  - A 1–5 scale per concrete dimension (SOLID, Cohesion, Extensibility) provides actionable clarity for the learner's next attempt.
+
+---
+
+### Decision 3: Extensibility & The Two Change Tests
+
+- **What the AI Suggested**:
+  - Combining the submission parsing and evaluation inside a single `EvaluationService` class that parses code directly and queries an LLM in one procedural script.
+- **What was Accepted vs. Rejected**:
+  - **Rejected**: Monolithic procedural evaluation method.
+  - **Accepted**: Separating submission content via `ISubmissionContent` (Strategy pattern) and decoupling evaluators via `IEvaluationStrategy` combined under a `CompositeEvaluator`.
+- **Why (Engineering Judgement)**:
+  - The Candidate Helping Guide explicitly highlighted **Change Test A** (supporting diagram submissions later) and **Change Test B** (adding rule-based or human evaluators later).
+  - A procedural script would require rewriting core domain code for either change.
+  - Decoupling `ISubmissionContent` and `IEvaluationStrategy` ensures both change tests pass cleanly with zero modifications to `Problem`, `Attempt`, or the practice loop.
+
+---
+
+### Decision 4: Resilience & Scale — Microservices / Kafka Queue vs Immediate Monolith State Machine
+
+- **What the AI Suggested**:
+  - Implementing an asynchronous event-driven microservices architecture using RabbitMQ/Kafka, Redis caching, and a separate Python FastAPI worker service for LLM inference.
+- **What was Accepted vs. Rejected**:
+  - **Rejected**: Distributed message brokers and multi-service deployments.
+  - **Accepted**: A **Single Modular Monolith** in TypeScript with immediate persistence before evaluation, an explicit domain state machine (`SUBMITTED → EVALUATING → COMPLETED / FAILED`), and in-process async evaluation with timeout fallbacks.
+- **Why (Engineering Judgement)**:
+  - The assignment explicitly cautioned: *"Do not spend the majority of your time on Kubernetes, microservices... A simple monolith is completely acceptable."*
+  - Adding distributed message queues introduces orchestration complexity without improving the core learner feedback loop.
+  - By persisting the submission immediately before triggering evaluation, user work is safe from crashes. The domain state machine cleanly models the lifecycle, while keeping the architecture maintainable and fast.
