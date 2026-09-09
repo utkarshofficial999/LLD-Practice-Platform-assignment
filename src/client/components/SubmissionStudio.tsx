@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Code, GitFork, MessageSquare, Send, Loader2, Braces } from 'lucide-react';
+import { Code, GitFork, MessageSquare, Send, Loader2 } from 'lucide-react';
 import { MermaidViewer } from './MermaidViewer.tsx';
 
 interface SubmissionStudioProps {
@@ -29,49 +29,49 @@ export const SubmissionStudio: React.FC<SubmissionStudioProps> = ({
   const wordCount = designRationale.trim().split(/\s+/).filter(Boolean).length;
 
   return (
-    <div className="pane" id="studio-pane">
-      <div className="pane-header">
-        <div className="studio-tabs">
+    <div className="pane" id="studio-pane" style={{ borderRight: '1px solid var(--border)' }}>
+      {/* Tab bar */}
+      <div className="studio-toolbar">
+        <div className="tab-group">
           <button
             id="tab-code-btn"
-            className={`studio-tab-btn ${activeTab === 'code' ? 'active' : ''}`}
+            className={`tab-btn ${activeTab === 'code' ? 'active' : ''}`}
             onClick={() => setActiveTab('code')}
           >
-            <Code size={13} /> Code
+            <Code size={12} /> Code
           </button>
           <button
             id="tab-diagram-btn"
-            className={`studio-tab-btn ${activeTab === 'diagram' ? 'active' : ''}`}
+            className={`tab-btn ${activeTab === 'diagram' ? 'active' : ''}`}
             onClick={() => setActiveTab('diagram')}
           >
-            <GitFork size={13} /> UML Diagram
+            <GitFork size={12} /> UML
           </button>
           <button
             id="tab-rationale-btn"
-            className={`studio-tab-btn ${activeTab === 'rationale' ? 'active' : ''}`}
+            className={`tab-btn ${activeTab === 'rationale' ? 'active' : ''}`}
             onClick={() => setActiveTab('rationale')}
           >
-            <MessageSquare size={13} /> Rationale
+            <MessageSquare size={12} /> Rationale
           </button>
         </div>
 
-        <div style={{
-          fontSize: '0.72rem',
-          color: 'var(--text-dim)',
-          fontFamily: 'var(--font-mono)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '4px'
-        }}>
-          <Braces size={12} /> TypeScript / UML
+        <div className="toolbar-meta">
+          <div className="save-dot" />
+          <span>Saved</span>
+          <span style={{ color: 'var(--border)' }}>·</span>
+          <span>TypeScript</span>
+          <span style={{ color: 'var(--border)' }}>·</span>
+          <span>{activeTab === 'code' ? `${codeLines} lines` : activeTab === 'rationale' ? `${wordCount} words` : 'Live preview'}</span>
         </div>
       </div>
 
-      <div className="pane-content" style={{ display: 'flex', flexDirection: 'column', padding: '14px' }}>
+      {/* Editor area */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {activeTab === 'code' && (
           <textarea
             id="skeleton-textarea"
-            className="editor-textarea"
+            className="code-editor"
             value={classSkeleton}
             onChange={(e) => onChangeSkeleton(e.target.value)}
             placeholder="// Model your classes, interfaces, and methods here..."
@@ -80,38 +80,37 @@ export const SubmissionStudio: React.FC<SubmissionStudioProps> = ({
         )}
 
         {activeTab === 'diagram' && (
-          <div style={{ display: 'grid', gridTemplateRows: '1fr 1fr', gap: '10px', height: '100%' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
             <textarea
               id="diagram-textarea"
-              className="editor-textarea"
+              className="code-editor"
+              style={{ flex: '0 0 45%', borderBottom: '1px solid var(--border)' }}
               value={diagramMermaid}
               onChange={(e) => onChangeDiagram(e.target.value)}
-              placeholder="classDiagram&#10;  ParkingLotController --> IPaymentStrategy"
+              placeholder="classDiagram&#10;  ParkingLot --> ParkingFloor"
               spellCheck={false}
             />
-            <div className="diagram-preview-card">
+            <div className="diagram-canvas" style={{ flex: 1 }}>
               <MermaidViewer chart={diagramMermaid} />
             </div>
           </div>
         )}
 
         {activeTab === 'rationale' && (
-          <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '10px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
             <div style={{
-              fontSize: '0.78rem',
-              color: 'var(--text-muted)',
-              padding: '10px 14px',
-              background: 'rgba(99, 102, 241, 0.05)',
-              border: '1px solid rgba(99, 102, 241, 0.15)',
-              borderRadius: 'var(--radius-sm)',
-              lineHeight: 1.55,
+              padding: '8px 16px',
+              fontSize: '0.72rem',
+              color: 'var(--text-dim)',
+              borderBottom: '1px solid var(--border)',
+              background: 'rgba(5,5,5,0.4)',
             }}>
-              💡 Explain: <strong>Assumptions</strong>, <strong>Chosen Patterns</strong>,
-              <strong> Trade-offs</strong>, and <strong>Concurrency handling</strong>.
+              Explain: <strong style={{ color: 'var(--text-muted)' }}>Assumptions</strong> · <strong style={{ color: 'var(--text-muted)' }}>Patterns</strong> · <strong style={{ color: 'var(--text-muted)' }}>Trade-offs</strong> · <strong style={{ color: 'var(--text-muted)' }}>Concurrency</strong>
             </div>
             <textarea
               id="rationale-textarea"
-              className="editor-textarea"
+              className="code-editor"
+              style={{ fontFamily: 'var(--font-sans)', fontSize: '0.82rem', lineHeight: 1.65 }}
               value={designRationale}
               onChange={(e) => onChangeRationale(e.target.value)}
               placeholder="Explain your trade-offs, pattern choices, and assumptions..."
@@ -121,32 +120,33 @@ export const SubmissionStudio: React.FC<SubmissionStudioProps> = ({
         )}
       </div>
 
-      <div className="studio-footer">
-        <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)', display: 'flex', gap: '16px' }}>
-          {activeTab === 'code' && <span>{codeLines} lines</span>}
-          {activeTab === 'diagram' && <span>Live preview</span>}
-          {activeTab === 'rationale' && <span>{wordCount} words</span>}
+      {/* Action bar */}
+      <div className="studio-action-bar">
+        <div className="action-status">
+          {isEvaluating ? (
+            <>
+              <Loader2 size={12} className="animate-spin" style={{ color: 'var(--accent)' }} />
+              <span style={{ color: 'var(--accent)' }}>Running evaluation...</span>
+            </>
+          ) : (
+            <span>Ready for evaluation</span>
+          )}
         </div>
 
         <button
           id="submit-design-btn"
-          className="header-btn primary"
+          className="action-btn-primary"
           onClick={onSubmit}
           disabled={isEvaluating}
-          style={{
-            opacity: isEvaluating ? 0.7 : 1,
-            cursor: isEvaluating ? 'not-allowed' : 'pointer',
-            minWidth: 180,
-            justifyContent: 'center',
-          }}
         >
           {isEvaluating ? (
             <>
-              <Loader2 size={15} className="animate-spin" /> Evaluating...
+              <Loader2 size={13} className="animate-spin" /> Evaluating
             </>
           ) : (
             <>
-              <Send size={15} /> Submit for Evaluation
+              <Send size={13} /> Run Evaluation
+              <span className="kbd">⌘↵</span>
             </>
           )}
         </button>

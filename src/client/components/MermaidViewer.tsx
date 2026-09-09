@@ -6,13 +6,17 @@ mermaid.initialize({
   theme: 'dark',
   themeVariables: {
     darkMode: true,
-    background: '#0d1322',
-    primaryColor: '#6366f1',
-    primaryTextColor: '#f8fafc',
-    primaryBorderColor: '#818cf8',
-    lineColor: '#94a3b8',
-    secondaryColor: '#0e1424',
-    tertiaryColor: '#1e293b',
+    background: '#050505',
+    primaryColor: '#111111',
+    primaryTextColor: '#D4D4D4',
+    primaryBorderColor: '#333333',
+    lineColor: '#555555',
+    secondaryColor: '#0D0D0D',
+    tertiaryColor: '#161616',
+    edgeLabelBackground: '#0D0D0D',
+    clusterBkg: '#0A0A0A',
+    clusterBorder: '#222222',
+    titleColor: '#A1A1AA',
   },
   securityLevel: 'loose',
 });
@@ -58,16 +62,16 @@ export const MermaidViewer: React.FC<MermaidViewerProps> = ({ chart }) => {
 
   if (error) {
     return (
-      <div style={{ color: '#fda4af', padding: '16px', fontSize: '0.84rem', fontFamily: 'monospace' }}>
-        ⚠️ {error}
+      <div style={{ color: 'var(--danger)', padding: '16px', fontSize: '0.75rem', fontFamily: 'var(--font-mono)' }}>
+        ⚠ {error}
       </div>
     );
   }
 
   if (!svgContent) {
     return (
-      <div style={{ color: '#64748b', padding: '24px', textAlign: 'center', fontSize: '0.85rem' }}>
-        No diagram defined. Switch to the <strong>Live UML Diagram</strong> tab to write or preview Mermaid code.
+      <div style={{ color: 'var(--text-dim)', padding: '24px', textAlign: 'center', fontSize: '0.78rem' }}>
+        Write Mermaid syntax above to preview the UML diagram.
       </div>
     );
   }
@@ -75,7 +79,7 @@ export const MermaidViewer: React.FC<MermaidViewerProps> = ({ chart }) => {
   return (
     <div
       ref={containerRef}
-      style={{ width: '100%', overflow: 'auto', display: 'flex', justifyContent: 'center' }}
+      style={{ width: '100%', overflow: 'auto', display: 'flex', justifyContent: 'center', padding: '16px' }}
       dangerouslySetInnerHTML={{ __html: svgContent }}
     />
   );

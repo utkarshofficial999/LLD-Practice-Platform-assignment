@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layers, History, Sparkles, RefreshCw, Zap } from 'lucide-react';
+import { Layers, History, RotateCcw, ChevronDown } from 'lucide-react';
 
 interface HeaderProps {
   problems: { id: string; title: string; difficulty: string }[];
@@ -22,53 +22,39 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   return (
     <header className="app-header">
-      <div className="brand-section">
-        <div className="brand-logo">
-          <Layers size={20} strokeWidth={2.5} />
-        </div>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span className="brand-title">LLD Studio</span>
-            <span className="brand-badge">
-              <Zap size={10} style={{ marginRight: '2px', display: 'inline' }} />
-              Practice & Eval
-            </span>
+      <div className="header-left">
+        <div className="brand-mark">
+          <div className="brand-icon">
+            <Layers size={13} strokeWidth={2} />
           </div>
+          <span className="brand-name">LLD Studio</span>
+        </div>
+        <div className="header-separator" />
+        <span className="status-tag">Engineering Mode</span>
+      </div>
+
+      <div className="header-center">
+        <div className="command-selector">
+          <ChevronDown size={12} style={{ color: 'var(--text-dim)', flexShrink: 0 }} />
+          <select
+            id="problem-select"
+            value={selectedProblemId}
+            onChange={(e) => onSelectProblem(e.target.value)}
+          >
+            {problems.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.title}
+              </option>
+            ))}
+          </select>
+          <span className="kbd">⌘K</span>
         </div>
       </div>
 
-      <div className="header-actions">
-        <select
-          id="problem-select"
-          className="problem-selector"
-          value={selectedProblemId}
-          onChange={(e) => onSelectProblem(e.target.value)}
-        >
-          {problems.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.title} ({p.difficulty})
-            </option>
-          ))}
-        </select>
-
+      <div className="header-right">
         {currentVersion > 0 && (
-          <div
-            style={{
-              fontSize: '0.82rem',
-              fontWeight: 700,
-              padding: '7px 14px',
-              borderRadius: 'var(--radius-md)',
-              background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.12))',
-              color: '#c4b5fd',
-              border: '1px solid rgba(139, 92, 246, 0.3)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              boxShadow: '0 0 16px rgba(139, 92, 246, 0.1), inset 0 1px 0 rgba(255,255,255,0.05)',
-              letterSpacing: '-0.01em',
-            }}
-          >
-            <Sparkles size={14} /> Attempt #{currentVersion}
+          <div className="header-chip accent">
+            v{currentVersion}
           </div>
         )}
 
@@ -77,9 +63,9 @@ export const Header: React.FC<HeaderProps> = ({
             id="compare-attempts-btn"
             className="header-btn"
             onClick={onOpenComparison}
-            title="Compare your attempts side-by-side"
+            title="Compare attempts"
           >
-            <History size={14} /> Compare
+            <History size={13} /> Compare
           </button>
         )}
 
@@ -89,7 +75,7 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={onReset}
           title="Reset to starter template"
         >
-          <RefreshCw size={14} /> Reset
+          <RotateCcw size={13} /> Reset
         </button>
       </div>
     </header>
