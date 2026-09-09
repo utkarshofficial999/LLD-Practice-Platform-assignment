@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layers, History, RotateCcw, ChevronDown } from 'lucide-react';
+import { Layers, History, RotateCcw, ChevronDown, Sun, Moon } from 'lucide-react';
 
 interface HeaderProps {
   problems: { id: string; title: string; difficulty: string }[];
@@ -9,6 +9,8 @@ interface HeaderProps {
   hasMultipleVersions: boolean;
   onOpenComparison: () => void;
   onReset: () => void;
+  theme: 'dark' | 'light';
+  onToggleTheme: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -19,6 +21,8 @@ export const Header: React.FC<HeaderProps> = ({
   hasMultipleVersions,
   onOpenComparison,
   onReset,
+  theme,
+  onToggleTheme,
 }) => {
   return (
     <header className="app-header">
@@ -77,7 +81,18 @@ export const Header: React.FC<HeaderProps> = ({
         >
           <RotateCcw size={13} /> Reset
         </button>
+
+        <button
+          id="theme-toggle-btn"
+          className="header-btn"
+          onClick={onToggleTheme}
+          title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+        >
+          {theme === 'dark' ? <Sun size={13} /> : <Moon size={13} />}
+          <span>{theme === 'dark' ? 'Light' : 'Night'}</span>
+        </button>
       </div>
     </header>
   );
 };
+

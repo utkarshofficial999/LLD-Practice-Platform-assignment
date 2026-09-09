@@ -49,6 +49,20 @@ export const App: React.FC = () => {
   const [versionB, setVersionB] = useState<number>(2);
   const [comparisonReport, setComparisonReport] = useState<any | null>(null);
 
+  // Theme state: 'dark' or 'light'
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    return (localStorage.getItem('lld-studio-theme') as 'dark' | 'light') || 'dark';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('lld-studio-theme', theme);
+  }, [theme]);
+
+  const handleToggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
+
   // 1. Fetch Problem Catalog
   useEffect(() => {
     const fetchProblems = async () => {
@@ -232,6 +246,8 @@ export const App: React.FC = () => {
         hasMultipleVersions={versionsList.length >= 2}
         onOpenComparison={handleOpenComparison}
         onReset={handleResetTemplate}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
       />
 
       <main className="workspace-grid">
