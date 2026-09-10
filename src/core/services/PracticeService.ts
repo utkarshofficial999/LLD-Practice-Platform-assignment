@@ -57,7 +57,15 @@ export class PracticeService {
     const problem = await this.getProblem(attempt.problemId);
 
     const rawContent = `${payload.classSkeleton}::${payload.designRationale}`;
-    const idempotencyKey = payload.idempotencyKey || Buffer.from(rawContent).toString('base64').slice(0, 32);
+    let h1 = 5381;
+    let h2 = 0;
+    for (let i = 0; i < rawContent.length; i++) {
+      const ch = rawContent.charCodeAt(i);
+      h1 = ((h1 << 5) + h1 + ch) | 0;
+      h2 = (ch + (h2 << 6) + (h2 << 16) - h2) | 0;
+    }
+    const defaultIdempotencyKey = `${rawContent.length}_${Math.abs(h1).toString(36)}_${Math.abs(h2).toString(36)}`;
+    const idempotencyKey = payload.idempotencyKey || defaultIdempotencyKey;
 
     const latestSub = attempt.getLatestSubmission();
     if (latestSub && latestSub.idempotencyKey === idempotencyKey && latestSub.status === 'COMPLETED') {

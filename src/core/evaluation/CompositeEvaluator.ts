@@ -12,9 +12,11 @@ export class CompositeEvaluator {
     if (strategies && strategies.length > 0) {
       this.strategies = strategies;
     } else {
+      const groqKey = typeof process !== 'undefined' ? process.env?.GROQ_API_KEY : undefined;
+      const fallbackKey = typeof process !== 'undefined' ? (process.env?.GEMINI_API_KEY || process.env?.OPENAI_API_KEY) : undefined;
       this.strategies = [
         new DeterministicEvaluator(),
-        new AIEvaluator(process.env.GROQ_API_KEY, process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY),
+        new AIEvaluator(groqKey, fallbackKey),
       ];
     }
   }
