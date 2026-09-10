@@ -2,31 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import mermaid from 'mermaid';
 import { AlertCircle } from 'lucide-react';
 
-mermaid.initialize({
-  startOnLoad: false,
-  theme: 'dark',
-  themeVariables: {
-    darkMode: true,
-    background: '#050505',
-    primaryColor: '#111111',
-    primaryTextColor: '#D4D4D4',
-    primaryBorderColor: '#333333',
-    lineColor: '#555555',
-    secondaryColor: '#0D0D0D',
-    tertiaryColor: '#161616',
-    edgeLabelBackground: '#0D0D0D',
-    clusterBkg: '#0A0A0A',
-    clusterBorder: '#222222',
-    titleColor: '#A1A1AA',
-  },
-  securityLevel: 'loose',
-});
 
 interface MermaidViewerProps {
   chart: string;
+  theme?: 'dark' | 'light';
 }
 
-export const MermaidViewer: React.FC<MermaidViewerProps> = ({ chart }) => {
+export const MermaidViewer: React.FC<MermaidViewerProps> = ({ chart, theme = 'light' }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [svgContent, setSvgContent] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
@@ -42,6 +24,42 @@ export const MermaidViewer: React.FC<MermaidViewerProps> = ({ chart }) => {
       }
 
       try {
+        const isLight = theme === 'light';
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: isLight ? 'default' : 'dark',
+          themeVariables: isLight
+            ? {
+                darkMode: false,
+                background: '#FAFAFA',
+                primaryColor: '#F4F4F5',
+                primaryTextColor: '#18181B',
+                primaryBorderColor: '#D4D4D8',
+                lineColor: '#71717A',
+                secondaryColor: '#E4E4E7',
+                tertiaryColor: '#F4F4F5',
+                edgeLabelBackground: '#FFFFFF',
+                clusterBkg: '#F9F9F9',
+                clusterBorder: '#E4E4E7',
+                titleColor: '#27272A',
+              }
+            : {
+                darkMode: true,
+                background: '#050505',
+                primaryColor: '#111111',
+                primaryTextColor: '#D4D4D4',
+                primaryBorderColor: '#333333',
+                lineColor: '#555555',
+                secondaryColor: '#0D0D0D',
+                tertiaryColor: '#161616',
+                edgeLabelBackground: '#0D0D0D',
+                clusterBkg: '#0A0A0A',
+                clusterBorder: '#222222',
+                titleColor: '#A1A1AA',
+              },
+          securityLevel: 'loose',
+        });
+
         const id = `mermaid-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
         const { svg } = await mermaid.render(id, chart);
         if (isMounted) {
@@ -59,7 +77,7 @@ export const MermaidViewer: React.FC<MermaidViewerProps> = ({ chart }) => {
     return () => {
       isMounted = false;
     };
-  }, [chart]);
+  }, [chart, theme]);
 
   if (error) {
     return (

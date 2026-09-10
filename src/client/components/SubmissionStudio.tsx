@@ -11,6 +11,7 @@ interface SubmissionStudioProps {
   onChangeDiagram: (val: string) => void;
   onSubmit: () => void;
   isEvaluating: boolean;
+  theme?: 'dark' | 'light';
 }
 
 export const SubmissionStudio: React.FC<SubmissionStudioProps> = ({
@@ -22,6 +23,7 @@ export const SubmissionStudio: React.FC<SubmissionStudioProps> = ({
   onChangeDiagram,
   onSubmit,
   isEvaluating,
+  theme = 'light',
 }) => {
   const [activeTab, setActiveTab] = useState<'code' | 'diagram' | 'rationale'>('code');
 
@@ -89,7 +91,7 @@ export const SubmissionStudio: React.FC<SubmissionStudioProps> = ({
               spellCheck={false}
             />
             <div className="diagram-canvas" style={{ flex: 1 }}>
-              <MermaidViewer chart={diagramMermaid} />
+              <MermaidViewer chart={diagramMermaid} theme={theme} />
             </div>
           </div>
         )}

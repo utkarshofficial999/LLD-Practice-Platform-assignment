@@ -50,7 +50,16 @@ export const App: React.FC = () => {
   const [comparisonReport, setComparisonReport] = useState<any | null>(null);
 
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
-    return (localStorage.getItem('lld-studio-theme') as 'dark' | 'light') || 'dark';
+    const isInitialized = localStorage.getItem('lld-studio-theme-initialized');
+    const saved = localStorage.getItem('lld-studio-theme') as 'dark' | 'light' | null;
+
+    if (!isInitialized) {
+      localStorage.setItem('lld-studio-theme-initialized', 'true');
+      localStorage.setItem('lld-studio-theme', 'light');
+      return 'light';
+    }
+
+    return saved === 'dark' || saved === 'light' ? saved : 'light';
   });
 
   useEffect(() => {
@@ -230,6 +239,7 @@ export const App: React.FC = () => {
           onChangeDiagram={setDiagramMermaid}
           onSubmit={handleSubmit}
           isEvaluating={isEvaluating}
+          theme={theme}
         />
 
         <FeedbackPanel
