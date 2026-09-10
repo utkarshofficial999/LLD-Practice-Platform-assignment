@@ -1,6 +1,9 @@
 # LLD Practice Platform
 > A domain-driven practice platform for Low-Level System Design (LLD) with hybrid deterministic static analysis and explainable AI rubric evaluation.
 
+- **Live Application**: [https://lld-practice-platform-git-main-utkarshs-projects-5d161d13.vercel.app](https://lld-practice-platform-git-main-utkarshs-projects-5d161d13.vercel.app)
+- **Repository**: [https://github.com/utkarshofficial999/LLD-Practice-Platform-assignment](https://github.com/utkarshofficial999/LLD-Practice-Platform-assignment)
+
 ---
 
 ## Table of Contents
@@ -68,8 +71,8 @@ Per the Candidate Helping Guide, our architecture explicitly fulfills both chang
 1. [RESEARCH_NOTE.md](RESEARCH_NOTE.md): Learner problem analysis, existing tool research (Educative, LeetCode, Mock interviews), key gaps, and product direction.
 2. [DESIGN_NOTE.md](DESIGN_NOTE.md): MVP architecture, domain model, class diagrams, change tests, evaluation division, and practical scaling.
 3. [AI_USAGE.md](AI_USAGE.md): 4 concrete AI-assisted engineering decisions: suggestions accepted vs rejected, and technical rationale.
-4. [Full Automated Test Suite](tests/): Vitest tests covering domain logic, Change Tests A & B, evaluators, anti-patterns, and progression deltas.
-5. **Interactive Working Prototype**: React + Express + Mermaid live diagramming + dark and light mode UI.
+4. [WORKING_PROTOTYPE.md](WORKING_PROTOTYPE.md): Live interactive working prototype with a 2-minute walkthrough guide.
+5. [TESTS.md](TESTS.md): Full test suite documentation covering domain invariants, change tests, and anti-pattern detection.
 
 ---
 
