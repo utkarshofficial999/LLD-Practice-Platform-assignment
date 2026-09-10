@@ -1,104 +1,104 @@
-================================================================================
-                           TESTS: LLD PRACTICE PLATFORM
-                 AUTOMATED TEST SUITE & EDGE CASE VALIDATION
-================================================================================
+# Automated Tests & Edge Case Verification
 
-1. TEST SUITE OVERVIEW
+Author: Candidate Submission
+Deliverable: Test Suite Documentation & Validation
+Framework: Vitest
+Status: 9 Tests Passing (100% Success)
+
 --------------------------------------------------------------------------------
-The test suite is built using Vitest and covers the complete architectural stack:
-domain invariants, evaluation engines, architectural change tests, failure
-modes, and the end-to-end practice lifecycle.
+1. How to Run the Tests
+--------------------------------------------------------------------------------
+From the project root:
 
-Test Command:
-   npm test        (Runs all test suites once)
-   npm run test:watch (Interactive test watcher)
+• Single Run:
+  npm test
 
-Current Results:
-   Test Files: 4 passed (4)
-   Tests:      9 passed (9)
-   Duration:   ~600ms
-   Result:     100% SUCCESSFUL
+• Live Watcher Mode:
+  npm run test:watch
+
+The suite finishes in ~600ms and requires zero external databases or mock servers.
 
 
-2. DETAILED TEST SUITE BREAKDOWN
+--------------------------------------------------------------------------------
+2. What We Test: Core Behavior & Invariants
 --------------------------------------------------------------------------------
 
-2.1 DOMAIN INVARIANTS & LIFECYCLE (`tests/domain.test.ts`)
-- Test 1: Problem Entity Coverage
-  * Verifies that Problem.checkEntityCoverage() accurately detects matched and
-    missing entities against arbitrary code token lists.
-- Test 2: Attempt Version Progression & Immutability
-  * Verifies that Attempt aggregate correctly increments versions (v1 -> v2),
-    attaches evaluations to specific versions, and isolates historical submissions.
-- Test 3: Structured Submission Content Extraction
-  * Verifies that StructuredSubmissionContent parses class names, interface names,
-    and method mappings via AST regex parsing.
+Group 1: Domain Invariants (`tests/domain.test.ts`)
+• Entity Coverage Check:
+  Verifies that `Problem.checkEntityCoverage()` correctly maps extracted class
+  names against mandatory domain entities, distinguishing between present and
+  missing concepts.
+• Attempt Immutability & Version Progression:
+  Ensures the `Attempt` aggregate root increments versions correctly (v1 -> v2),
+  keeps historical submissions immutable, and pairs each evaluation with its
+  corresponding version.
+• Structural Token Parsing:
+  Verifies that `StructuredSubmissionContent` extracts classes, interfaces, and
+  method signatures reliably without requiring a full compiler pipeline.
 
-2.2 EVALUATION ENGINES & ANTI-PATTERN DETECTION (`tests/evaluation.test.ts`)
-- Test 4: God Class Detection (Single Responsibility Principle)
-  * Edge case: Submits a class with 6 or more methods.
-  * Expected behavior: DeterministicEvaluator flags a "God Class Tendency" warning
-    and cites the offending element.
-- Test 5: Missing Interface Abstraction (Dependency Inversion Principle)
-  * Edge case: Submits concrete classes without any interface declarations.
-  * Expected behavior: DeterministicEvaluator flags a critical "Lack of Interface
-    Abstraction" issue.
-- Test 6: Composite Evaluator Orchestration
-  * Verifies that CompositeEvaluator runs multiple evaluation strategies in sequence,
-    merging deterministic findings with rubric assessments.
+Group 2: Evaluator Rules & Anti-Pattern Detection (`tests/evaluation.test.ts`)
+• God Class Detection (Single Responsibility Principle):
+  Tests that when a class defines 6 or more methods, the deterministic analyzer
+  flags a "God Class Tendency" warning, citing the offending class name.
+• Missing Interface Abstractions (Dependency Inversion Principle):
+  Tests that if a submission defines concrete classes with zero interfaces,
+  the system flags a critical "Lack of Interface Abstraction" finding.
+• Composite Pipeline Orchestration:
+  Verifies that `CompositeEvaluator` executes multiple evaluation strategies
+  seamlessly and aggregates deterministic findings with rubric assessments.
 
-2.3 THE TWO CANDIDATE GUIDE CHANGE TESTS (`tests/change_tests.test.ts`)
-- Test 7: Change Test A - New Submission Formats
-  * Objective: Support a diagram/JSON canvas format later without changing the domain.
-  * Verification: Creates a `CustomVisualSubmissionContent` class implementing
-    `ISubmissionContent`. Submits it to Attempt. Evaluates cleanly with ZERO changes
-    to Problem, Attempt, or Evaluator classes.
-- Test 8: Change Test B - New Evaluation Strategies
-  * Objective: Add rule-based linter or human reviewer without rewriting practice flow.
-  * Verification: Creates a `CustomMockHumanReviewEvaluator` implementing
-    `IEvaluationStrategy`. Plugs into `CompositeEvaluator`. Verifies the new stage
-    appears in results with ZERO changes to PracticeService or Attempt.
+Group 3: Candidate Guide Change Tests (`tests/change_tests.test.ts`)
+• Change Test A (New Submission Formats):
+  Simulates adding a new diagram-based or JSON canvas submission format.
+  A new `CustomVisualSubmissionContent` class implementing `ISubmissionContent`
+  is passed to the domain with ZERO modifications to `Problem`, `Attempt`, or
+  the evaluators.
+• Change Test B (New Evaluator Strategies):
+  Simulates adding a human reviewer or rule-based AST linter. A custom
+  `CustomMockHumanReviewEvaluator` implementing `IEvaluationStrategy` is plugged
+  into `CompositeEvaluator` with ZERO modifications to `PracticeService` or `Attempt`.
 
-2.4 PRACTICE SERVICE END-TO-END LOOP & EDGE CASES (`tests/practice_service.test.ts`)
-- Test 9: Complete Practice Loop Orchestration
-  * Sequence tested:
-    1. practiceService.listProblems() -> selects problem
-    2. practiceService.startAttempt() -> creates attempt session
-    3. practiceService.submitAttempt() -> processes Version 1 submission
-    4. practiceService.submitAttempt() -> processes Version 2 submission
-    5. practiceService.compareAttemptVersions() -> generates progression report
-  * Verifies:
-    - Version 2 has higher or equal score than Version 1
-    - ProgressionReport accurately links previousVersion (1) and targetVersion (2)
-    - Score delta is calculated accurately
+Group 4: End-to-End Practice Loop (`tests/practice_service.test.ts`)
+• Complete Multi-Attempt Flow:
+  Orchestrates the full lifecycle:
+  1. `listProblems()` -> returns problem catalog.
+  2. `startAttempt()` -> initializes learner attempt session.
+  3. `submitAttempt()` (Attempt 1) -> evaluates initial draft.
+  4. `submitAttempt()` (Attempt 2) -> evaluates refactored draft.
+  5. `compareAttemptVersions()` -> generates progression diff report showing
+     score improvements and resolved concerns.
 
 
-3. FAILURE MODES & EDGE CASES TESTED
 --------------------------------------------------------------------------------
-1. Idempotent Duplicate Submissions:
-   - Behavior: If the learner accidentally clicks submit twice with identical
-     content, the service detects matching idempotency keys and returns the
-     cached evaluation without duplicate submission records or wasted LLM calls.
+3. Edge Cases & Failure Modes Handled
+--------------------------------------------------------------------------------
+• Duplicate / Rapid-Fire Submissions (Idempotency):
+  If a user double-clicks the "Run Evaluation" button, the system computes a
+  content hash across the submission. If identical to the latest completed
+  version, it returns the cached evaluation without creating duplicate records
+  or burning redundant LLM tokens.
 
-2. Missing or Non-Existent Problem ID:
-   - Behavior: Requesting a problem with an invalid ID throws a clean 404 error
-     ("Problem with ID 'invalid' not found") rather than crashing.
+• Invalid or Non-Existent IDs:
+  Requesting an unknown problem ID or attempt ID safely returns a clear error
+  rather than throwing unhandled exceptions or crashing the server.
 
-3. Missing Mandatory Submission Fields:
-   - Behavior: Submissions missing both class skeleton and rationale are rejected
-     with 400 Bad Request ("Both classSkeleton and designRationale are required").
+• Incomplete Submissions:
+  Submissions missing mandatory components (e.g. empty class skeleton or empty
+  rationale) are rejected early with friendly, descriptive validation messages.
 
-4. Evaluation Fallback Under API Failure:
-   - Behavior: If Groq LLM API is unavailable, times out, or has an invalid key,
-     the system automatically falls back to local heuristic evaluation, ensuring
-     the learner always receives structured feedback.
+• API Outages & LLM Failures:
+  If the remote LLM API fails (network timeout, rate limit, or missing API key),
+  the system automatically falls back to its local heuristic evaluation engine.
+  The learner never receives an unhandled error or blank screen.
 
-5. Browser Universal Compatibility:
-   - Behavior: Idempotency hashing uses pure JS (DJB2 + SDBM) without relying on
-     Node's `Buffer`, preventing runtime reference crashes in web browsers.
+• Cross-Environment Portability:
+  Hashing and domain logic use universal JavaScript algorithms (DJB2 + SDBM)
+  rather than Node-specific globals (`Buffer`), allowing identical evaluation
+  logic to execute both in Node.js and directly inside the user's browser.
 
 
-4. TEST RUN OUTPUT LOG
+--------------------------------------------------------------------------------
+4. Actual Test Run Log
 --------------------------------------------------------------------------------
 $ npm test
 
@@ -114,6 +114,4 @@ $ npm test
 
  Test Files  4 passed (4)
       Tests  9 passed (9)
-   Start at  11:12:55
    Duration  608ms (transform 204ms, setup 0ms, collect 424ms, tests 26ms)
-================================================================================

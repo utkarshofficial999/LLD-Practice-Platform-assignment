@@ -1,106 +1,101 @@
-================================================================================
-                         README: LLD PRACTICE PLATFORM
-              SYSTEM GUIDE, SETUP, ARCHITECTURE & DECISIONS
-================================================================================
+# LLD Practice Platform
 
-1. PROJECT OVERVIEW
+A domain-driven practice platform for Low-Level System Design (LLD), featuring
+hybrid deterministic static analysis and evidence-based AI rubric evaluation.
+
 --------------------------------------------------------------------------------
-LLD Practice Platform is a focused Low-Level System Design (LLD) practice
-application designed to help software engineers transition from writing
-functional algorithms to architecting scalable, decoupled, and maintainable
-software systems.
-
-Unlike Data Structures & Algorithms platforms where solutions are binary
-(pass/fail), object-oriented design is fundamentally about trade-offs,
-abstractions, and separation of concerns.
-
-Key Features:
-- Real-world curated problem scenarios (Parking Lot System, Elevator Dispatcher).
-- Three-Panel Studio: Specification & requirements on the left, interactive
-  multi-tab editor (TypeScript skeleton, live Mermaid UML class diagram, design
-  rationale) in the center, and explainable AI rubric feedback on the right.
-- Hybrid Evaluation: Deterministic static rules engine (checks entity coverage,
-  God Classes, missing interfaces) paired with evidence-backed AI judgment.
-- Version Progression & Comparison: Automatic versioning (v1 -> v2) with
-  side-by-side progression reporting highlighting resolved issues and score deltas.
-- 100% Uptime Architecture: Works both with local/serverless Node backend and
-  gracefully falls back to in-browser client evaluation when network fails.
-
-
-2. DELIVERABLES SUMMARY
+1. Why We Built This
 --------------------------------------------------------------------------------
-This project includes complete deliverables matching the submission criteria:
-1. Research Note        -> RESEARCH_NOTE.txt / RESEARCH_NOTE.md
-2. Design Note          -> DESIGN_NOTE.txt / DESIGN_NOTE.md
-3. Working Prototype    -> WORKING_PROTOTYPE.txt (Live on Vercel)
-4. Tests                -> TESTS.txt (9 automated Vitest test cases)
-5. README + AI Usage    -> README.txt + AI_USAGE.txt / AI_USAGE.md
+Practicing Low-Level Design (LLD) is notoriously difficult for self-directed
+engineers. Unlike algorithms platforms where code either passes or fails unit tests,
+object-oriented design is about trade-offs, clean responsibilities, and extensible
+abstractions.
+
+We built this platform to give learners what has always been missing:
+an instant, objective, and evidence-backed feedback loop that tracks design growth
+over multiple iterations.
 
 
-3. QUICK START & RUN INSTRUCTIONS
+--------------------------------------------------------------------------------
+2. Core Features
+--------------------------------------------------------------------------------
+• Realistic Problem Scenarios:
+  Curated design challenges (Multi-Floor Parking Lot, High-Rise Elevator Dispatcher)
+  with explicit domain entity checklists, behavioral expectations, and scoring rubrics.
+
+• Three-Panel Studio Workspace:
+  - Left: Problem specification and dynamic entity detection checklist.
+  - Center: Multi-tab editor with TypeScript skeleton code, live visual Mermaid UML
+    class diagrams, and architectural rationale notes.
+  - Right: AI Architect scorecard with 5-criteria rubric ratings, anti-pattern
+    warnings, and attempt progression diffing.
+
+• Hybrid Evaluation Pipeline:
+  Pairs deterministic static analysis (checks mandatory entities, God Classes,
+  missing interfaces) with an AI architectural judgment engine that cites exact
+  lines of code to support its evaluation.
+
+• Version Comparison & Progression:
+  Submissions are automatically versioned (v1 -> v2). A dedicated comparison modal
+  highlights resolved concerns, score changes, and remaining suggestions.
+
+• Resilient 100% Uptime:
+  Engineered to run seamlessly on a Node server or Vercel Serverless, while featuring
+  an intelligent in-browser fallback service that ensures the platform continues
+  functioning even during network drops or cold starts.
+
+
+--------------------------------------------------------------------------------
+3. Quick Start Guide
 --------------------------------------------------------------------------------
 Prerequisites: Node.js (v18+) and npm.
 
-Step 1: Install Dependencies
+1. Install Dependencies:
    npm install
 
-Step 2: Environment Setup
+2. Environment Setup (Optional):
    Create a `.env` file in the project root:
    GROQ_API_KEY=your_groq_api_key_here
+   (If left blank, the platform automatically uses its built-in local evaluator).
 
-Step 3: Run Locally (Concurrently starts Server on 3001 & Client on 5173)
+3. Start Locally:
    npm run dev
+   This concurrently runs the Express server (port 3001) and Vite client (port 5173).
 
-Step 4: Open in Browser
+4. Open in Browser:
    http://localhost:5173
 
-Step 5: Run Automated Tests
+5. Run Automated Tests:
    npm test
 
 
-4. CORE ARCHITECTURE & DOMAIN MODEL
 --------------------------------------------------------------------------------
-Organized under Clean Architecture principles (`src/core/domain/`):
-- `Problem`: Domain challenge definition, required entity checklist, expectations.
-- `Attempt` (Aggregate Root): Continuous session managing versioned submissions.
-- `Submission` (Entity): Immutable snapshot with idempotency key and explicit
-  lifecycle transitions (`SUBMITTED` -> `EVALUATING` -> `COMPLETED` / `FAILED`).
-- `ISubmissionContent` (Strategy): Encapsulates code skeleton, UML diagram, and
-  rationale, allowing arbitrary submission formats without domain changes.
-- `IEvaluationStrategy` & `CompositeEvaluator`: Plug-and-play evaluation pipeline
-  combining deterministic structural checks with AI rubric assessments.
-- `PracticeService`: Application orchestration service for the complete loop.
-
-
-5. THE TWO ARCHITECTURAL CHANGE TESTS
+4. The Two Architectural Change Tests
 --------------------------------------------------------------------------------
-- Change Test A (New Submission Formats like JSON Canvas / Diagrams):
-  Solved via `ISubmissionContent` interface. Adding new formats requires ZERO
-  changes to `Problem`, `Attempt`, or `Evaluator` classes.
-  Verified in `tests/change_tests.test.ts`.
+Our architecture is built around Clean Architecture and passed the Candidate Guide's
+two critical change tests:
 
-- Change Test B (New Evaluation Strategies like Rule Linters or Human Review):
-  Solved via `IEvaluationStrategy` and `CompositeEvaluator`. Adding human review
-  or AST checkers requires ZERO changes to `PracticeService` or `Attempt`.
-  Verified in `tests/change_tests.test.ts`.
+• Change Test A (New Submission Formats):
+  Adding a new visual diagram or JSON canvas submission requires ZERO changes to
+  Problem, Attempt, or Evaluator classes. `Submission` delegates directly to an
+  `ISubmissionContent` strategy interface. Tested in `tests/change_tests.test.ts`.
+
+• Change Test B (New Evaluation Strategies):
+  Adding human mentors, peer reviewers, or automated AST linters requires ZERO
+  changes to `PracticeService` or `Attempt`. Evaluators implement `IEvaluationStrategy`
+  and plug into `CompositeEvaluator`. Tested in `tests/change_tests.test.ts`.
 
 
-6. KEY ENGINEERING DECISIONS & LIMITATIONS
 --------------------------------------------------------------------------------
-Key Decisions:
-1. Structured Design Model over Full Executable Code:
-   Avoids forcing learners to spend 80% of their time writing getter/setter
-   boilerplate or debugging compiler errors instead of reasoning about design.
-2. Evidence-Based Rubric over Arbitrary 0-100 Score:
-   Requires exact citations from code, preventing ungrounded AI hallucinations.
-3. Modular Monolith over Distributed Microservices:
-   Eliminated needless operational complexity (Kafka, Redis, Docker), ensuring
-   instant setup, fast response times, and high maintainability.
-
-Known Limitations:
-- Single Active User Session: The in-memory repository is per-client/server
-  instance. A production deployment would persist attempts to PostgreSQL.
-- Diagram Rendering: Uses Mermaid.js; advanced free-form drag-and-drop spatial
-  positioning would benefit from a dedicated canvas like React Flow.
-- Language Focus: Currently optimized for TypeScript/Java/C#-style OOP syntax.
-================================================================================
+5. Project Structure
+--------------------------------------------------------------------------------
+src/
+├── core/
+│   ├── domain/         # Pure domain entities (Problem, Attempt, Submission, Feedback)
+│   ├── evaluation/     # Hybrid evaluators (Deterministic, AI, Composite, Progression)
+│   ├── repositories/   # Storage interfaces and in-memory repositories
+│   └── services/       # PracticeService application orchestrator
+├── server/             # Express API application & Vercel serverless adapter
+└── client/             # React 19 UI, three-panel studio, Mermaid UML visualizer, theme
+tests/                  # 9 automated Vitest test suites (domain, evaluation, change tests)
+submission_deliverables/# Plain-text copies formatted for assessment upload

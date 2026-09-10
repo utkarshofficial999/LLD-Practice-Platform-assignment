@@ -1,106 +1,102 @@
-================================================================================
-                    WORKING PROTOTYPE: LLD PRACTICE PLATFORM
-                         END-TO-END DEMO & ACCESS GUIDE
-================================================================================
+# Working Prototype: LLD Practice Platform
 
-1. LIVE PROTOTYPE ACCESS
+Author: Candidate Submission
+Deliverable: Working Prototype Guide & Walkthrough
+Status: Deployed & Live on Vercel
+
 --------------------------------------------------------------------------------
-- Live Production URL (Vercel):
+1. Quick Links
+--------------------------------------------------------------------------------
+• Live Application:
   https://lld-practice-platform-git-main-utkarshs-projects-5d161d13.vercel.app
 
-- GitHub Source Repository:
+• GitHub Repository:
   https://github.com/utkarshofficial999/LLD-Practice-Platform-assignment
 
-- Tech Stack:
-  * Frontend: React 19, TypeScript, Vite, Mermaid.js, Lucide Icons, Pure CSS
-  * Backend: Express 4, TypeScript (tsx), Vercel Serverless Functions
-  * Testing: Vitest (9 automated tests covering domain, loop, and change tests)
-  * AI Layer: Groq API (llama-3.3-70b-versatile) with heuristic local fallback
+• Tech Stack:
+  - Frontend: React 19, TypeScript, Vite, Mermaid.js, Lucide Icons, Pure CSS
+  - Backend: Node.js, Express, Vercel Serverless Functions
+  - AI Engine: Groq LLM (llama-3.3-70b-versatile) + Local Heuristic Fallback
+  - Automated Testing: Vitest (9 test suites covering domain and change tests)
 
 
-2. STEP-BY-STEP END-TO-END PRACTICE FLOW
 --------------------------------------------------------------------------------
-Follow this walkthrough to experience the complete learner journey:
-
-STEP 1: PROBLEM SELECTION & SPECIFICATION REVIEW
-1. Open the Live URL.
-2. In the top navigation bar, use the Problem Dropdown to switch between:
-   - "Design a Multi-Floor Parking Lot System" (Medium)
-   - "Design a High-Rise Elevator Dispatching System" (Hard)
-3. The Left Specification Panel immediately populates with:
-   - Domain Scenario description
-   - Required Domain Entities checklist (with live detection status badges)
-   - Key Behavioral Expectations & Concurrency requirements
-   - Official Rubric Criteria & weights
-
-STEP 2: MODELING IN THE STUDIO WORKSPACE
-1. Center Panel contains three synchronized views:
-   - [<> Code] Tab: Multi-line TypeScript skeleton editor with starter template.
-   - [UML] Tab: Interactive, live-rendered Mermaid Class Diagram visualizing
-     classes, interfaces, and relationships.
-   - [Rationale] Tab: Structured design decisions and concurrency assumptions.
-2. Notice as you type in the Code tab, the left panel's "Domain Entities" checklist
-   dynamically updates in real-time to show detected vs missing entities.
-
-STEP 3: HYBRID EVALUATION (VERSION 1 SUBMISSION)
-1. Click the "Run Evaluation" button at the bottom right.
-2. The submission enters the evaluation lifecycle:
-   SUBMITTED -> EVALUATING -> COMPLETED.
-3. The Right Panel (AI Architect) presents the comprehensive Scorecard:
-   - Overall Quality Score (e.g. 8.0/10) with Production Readiness indicator.
-   - Static Analysis Findings: Domain entity coverage and anti-pattern flags
-     (e.g., God Class warnings, missing interfaces).
-   - 5-Criteria Rubric Assessment:
-     * Requirement Coverage (1-5) + exact evidence quote from submission
-     * Single Responsibility & Cohesion (1-5) + specific concern
-     * Coupling & Abstraction Depth (1-5) + actionable improvement
-     * Extensibility & Patterns (1-5)
-     * Trade-off Reasoning & Assumptions (1-5)
-
-STEP 4: REFACTORING & ITERATING (VERSION 2 SUBMISSION)
-1. In the Code tab, modify the design (e.g. add a new interface or decompose
-   a class) and refine the Rationale tab.
-2. Click "Run Evaluation" again.
-3. The submission is versioned automatically (v1 -> v2).
-4. The system evaluates the updated design and updates the version badge to "v2".
-
-STEP 5: ATTEMPT COMPARISON & PROGRESSION REPORT
-1. Once two versions exist, the "Compare (v1 vs v2)" button in the header activates.
-2. Click "Compare (v1 vs v2)" to open the Version Comparison Modal.
-3. Inspect the side-by-side progression:
-   - Overall score delta (+/- points)
-   - Resolved architectural concerns from Version 1
-   - Newly flagged issues or regressions
-   - Criterion-by-criterion delta breakdown
-
-
-3. ADDITIONAL PLATFORM CAPABILITIES
+2. Try It Yourself: Step-by-Step Practice Walkthrough
 --------------------------------------------------------------------------------
-- Theme Toggle: Switch between Dark Mode ("Night") and Light Mode ("Day") with
-  persistent localStorage theme retention.
-- Reset Template: One-click restore to original problem starter templates.
-- Resilient Offline / Serverless Mode: If network latency occurs, the embedded
-  in-browser client service takes over transparently, ensuring 100% uptime.
+You can test the complete end-to-end learning loop in under 2 minutes:
+
+Step 1: Explore the Problem
+- Open the live URL.
+- Use the dropdown at the top center to view available challenges:
+  * "Design a Multi-Floor Parking Lot System" (Medium)
+  * "Design a High-Rise Elevator Dispatching System" (Hard)
+- Notice the Left Panel:
+  * Problem statement & real-world scenario
+  * Required Domain Concepts checklist (e.g. ParkingSpot, Ticket, PaymentStrategy)
+  * Behavioral expectations & concurrency requirements
+  * Scoring rubrics
+
+Step 2: Inspect the Three-Tab Studio (Center Panel)
+- [Code] Tab: Contains a starter TypeScript skeleton with class and enum definitions.
+  As you edit classes, the left checklist updates its checkmarks in real time.
+- [UML] Tab: Renders an interactive Mermaid class diagram showing class boxes,
+  methods, and relationships.
+- [Rationale] Tab: Explains the architectural trade-offs, pattern choices, and
+  concurrency locking strategy.
+
+Step 3: Run the Evaluation (Version 1)
+- Click the blue "Run Evaluation" button at the bottom right.
+- The Right Panel ("AI Architect") loads the scorecard:
+  * Overall Design Quality Score (e.g. 8.0/10 — Production Ready)
+  * Entity coverage verification
+  * Anti-pattern flags (God Class, missing interfaces)
+  * 5 Rubric Criteria breakdown with direct quotes cited from your code
+
+Step 4: Refactor & Submit Version 2
+- In the Code tab, make an adjustment (for example, introduce a new interface
+  or extract a method to improve separation of concerns).
+- Click "Run Evaluation" again.
+- The version counter updates to "v2" and the new score is displayed.
+
+Step 5: Compare Your Versions
+- With 2 versions submitted, click the "Compare (v1 vs v2)" button in the header.
+- An interactive modal appears showing your progression:
+  * Overall score delta (+/- points)
+  * Concerns that were resolved in Version 2
+  * Detailed criteria comparison side-by-side
 
 
-4. HOW TO RUN LOCALLY
 --------------------------------------------------------------------------------
-Prerequisites: Node.js (v18+) and npm
+3. Extra Studio Features
+--------------------------------------------------------------------------------
+• Dark / Light Theme: Toggle between "Night" and "Day" modes using the moon/sun
+  icon in the top right. Your preference is saved in localStorage.
+• Reset Template: Click "Reset" to cleanly revert back to the original starter
+  template for the selected problem.
+• Offline / Serverless Resilience: The platform includes an intelligent in-browser
+  service fallback. If network connectivity drops or the serverless function cold-starts,
+  the app continues to load and evaluate designs locally without interruption.
 
-1. Clone repository:
+
+--------------------------------------------------------------------------------
+4. Running the Project Locally
+--------------------------------------------------------------------------------
+If you prefer to run the project on your local machine:
+
+1. Clone the repository:
    git clone https://github.com/utkarshofficial999/LLD-Practice-Platform-assignment.git
    cd LLD-Practice-Platform-assignment
 
 2. Install dependencies:
    npm install
 
-3. Configure Environment (.env):
-   Create a `.env` file in the project root:
+3. Set up environment:
+   Create a `.env` file in the root folder:
    GROQ_API_KEY=your_groq_api_key_here
+   (Note: If left blank, the platform automatically uses its built-in local evaluator).
 
-4. Start both Server & Client concurrently:
+4. Start both Server & Client:
    npm run dev
 
-5. Open browser:
+5. Open your browser:
    http://localhost:5173
-================================================================================
