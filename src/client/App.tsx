@@ -4,6 +4,7 @@ import { ProblemViewer } from './components/ProblemViewer.tsx';
 import { SubmissionStudio } from './components/SubmissionStudio.tsx';
 import { FeedbackPanel } from './components/FeedbackPanel.tsx';
 import { ComparisonModal } from './components/ComparisonModal.tsx';
+import { clientPracticeService } from './services/ClientPracticeService.ts';
 
 interface ProblemSummary {
   id: string;
@@ -64,11 +65,10 @@ export const App: React.FC = () => {
   useEffect(() => {
     const fetchProblems = async () => {
       try {
-        const res = await fetch('/api/problems');
-        const json = await res.json();
-        if (json.success && json.data.length > 0) {
-          setProblems(json.data);
-          setSelectedProblemId(json.data[0].id);
+        const data = await clientPracticeService.getProblems();
+        if (data && data.length > 0) {
+          setProblems(data);
+          setSelectedProblemId(data[0].id);
         }
       } catch (err) {
         console.error('Failed to fetch problems:', err);
@@ -82,11 +82,8 @@ export const App: React.FC = () => {
 
     const loadProblem = async () => {
       try {
-        const probRes = await fetch(`/api/problems/${selectedProblemId}`);
-        const probJson = await probRes.json();
-
-        if (probJson.success) {
-          const p: FullProblem = probJson.data;
+        const p: FullProblem = (await clientPracticeService.getProblem(selectedProblemId)) as any;
+        if (p) {
           setProblemDetail(p);
           setClassSkeleton(p.starterTemplate.skeleton);
           setDesignRationale(p.starterTemplate.rationale);
@@ -96,14 +93,9 @@ export const App: React.FC = () => {
           setCurrentVersion(0);
           setVersionsList([]);
 
-          const attRes = await fetch('/api/attempts', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ problemId: p.id }),
-          });
-          const attJson = await attRes.json();
-          if (attJson.success) {
-            setAttemptId(attJson.data.id);
+          const att = await clientPracticeService.startAttempt(p.id);
+          if (att && att.id) {
+            setAttemptId(att.id);
           }
         }
       } catch (err) {
@@ -136,30 +128,25 @@ export const App: React.FC = () => {
     setErrorDiagnostic(undefined);
 
     try {
-      const res = await fetch(`/api/attempts/${attemptId}/submit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          classSkeleton,
-          designRationale,
-          diagramMermaid,
-        }),
+      const res = await clientPracticeService.submitAttempt(attemptId, {
+        classSkeleton,
+        designRationale,
+        diagramMermaid,
       });
 
-      const json = await res.json();
-      if (json.success) {
-        setCurrentVersion(json.data.version);
-        setVersionsList((prev) => Array.from(new Set([...prev, json.data.version])));
-        setSubmissionStatus(json.data.status);
-        setEvaluation(json.data.evaluation || null);
+      if (res.success && res.data) {
+        setCurrentVersion(res.data.version);
+        setVersionsList((prev) => Array.from(new Set([...prev, res.data.version])));
+        setSubmissionStatus(res.data.status);
+        setEvaluation(res.data.evaluation || null);
 
-        if (json.data.version > 1) {
-          setVersionA(json.data.version - 1);
-          setVersionB(json.data.version);
+        if (res.data.version > 1) {
+          setVersionA(res.data.version - 1);
+          setVersionB(res.data.version);
         }
       } else {
         setSubmissionStatus('FAILED');
-        setErrorDiagnostic(json.error || 'Evaluation failed');
+        setErrorDiagnostic(res.error || 'Evaluation failed');
       }
     } catch (err: any) {
       setSubmissionStatus('FAILED');
@@ -173,15 +160,10 @@ export const App: React.FC = () => {
     if (!attemptId || currentVersion === 0) return;
     setIsEvaluating(true);
     try {
-      const res = await fetch(`/api/attempts/${attemptId}/retry`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ version: currentVersion }),
-      });
-      const json = await res.json();
-      if (json.success) {
-        setSubmissionStatus(json.data.status);
-        setEvaluation(json.data.evaluation);
+      const res = await clientPracticeService.retryEvaluation(attemptId, currentVersion);
+      if (res.success && res.data) {
+        setSubmissionStatus(res.data.status);
+        setEvaluation(res.data.evaluation);
       }
     } catch (err) {
       console.error('Retry error:', err);
@@ -213,10 +195,9 @@ export const App: React.FC = () => {
 
   const fetchComparison = async (vA: number, vB: number) => {
     try {
-      const res = await fetch(`/api/attempts/${attemptId}/compare?versionA=${vA}&versionB=${vB}`);
-      const json = await res.json();
-      if (json.success) {
-        setComparisonReport(json.data);
+      const res = await clientPracticeService.compareVersions(attemptId, vA, vB);
+      if (res.success && res.data) {
+        setComparisonReport(res.data);
       }
     } catch (err) {
       console.error('Comparison error:', err);
