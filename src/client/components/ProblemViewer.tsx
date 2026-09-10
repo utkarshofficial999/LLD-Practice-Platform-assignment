@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, CheckCircle2, Circle, ChevronRight } from 'lucide-react';
+import { FileText, CheckCircle2, ChevronRight } from 'lucide-react';
 
 interface ProblemViewerProps {
   problem: {
@@ -62,7 +62,6 @@ export const ProblemViewer: React.FC<ProblemViewerProps> = ({ problem, detectedE
 
         <p className="problem-desc">{problem.description}</p>
 
-        {/* Domain Entities */}
         <div className="section-heading">
           Domain Entities
           <span className="section-count">{detectedCount.toString().padStart(2, '0')} / {totalEntities.toString().padStart(2, '0')}</span>
@@ -97,7 +96,6 @@ export const ProblemViewer: React.FC<ProblemViewerProps> = ({ problem, detectedE
           })}
         </div>
 
-        {/* Behavioral Expectations */}
         <div className="section-heading">Behavioral Expectations</div>
         <ul className="expectation-list">
           {problem.keyExpectations.map((exp, idx) => (
@@ -108,7 +106,6 @@ export const ProblemViewer: React.FC<ProblemViewerProps> = ({ problem, detectedE
           ))}
         </ul>
 
-        {/* Evaluation Rubric */}
         <div className="section-heading">Evaluation Criteria</div>
         <div>
           {problem.rubric.map((r) => (

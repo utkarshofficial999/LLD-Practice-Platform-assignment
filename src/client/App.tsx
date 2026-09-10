@@ -43,13 +43,11 @@ export const App: React.FC = () => {
   const [errorDiagnostic, setErrorDiagnostic] = useState<string | undefined>(undefined);
   const [evaluation, setEvaluation] = useState<any | null>(null);
 
-  // Comparison modal state
   const [isComparisonOpen, setIsComparisonOpen] = useState<boolean>(false);
   const [versionA, setVersionA] = useState<number>(1);
   const [versionB, setVersionB] = useState<number>(2);
   const [comparisonReport, setComparisonReport] = useState<any | null>(null);
 
-  // Theme state: 'dark' or 'light'
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     return (localStorage.getItem('lld-studio-theme') as 'dark' | 'light') || 'dark';
   });
@@ -63,7 +61,6 @@ export const App: React.FC = () => {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
-  // 1. Fetch Problem Catalog
   useEffect(() => {
     const fetchProblems = async () => {
       try {
@@ -80,7 +77,6 @@ export const App: React.FC = () => {
     fetchProblems();
   }, []);
 
-  // 2. Fetch Selected Problem Details & Initialize Attempt
   useEffect(() => {
     if (!selectedProblemId) return;
 
@@ -100,7 +96,6 @@ export const App: React.FC = () => {
           setCurrentVersion(0);
           setVersionsList([]);
 
-          // Start a new attempt session
           const attRes = await fetch('/api/attempts', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -119,7 +114,6 @@ export const App: React.FC = () => {
     loadProblem();
   }, [selectedProblemId]);
 
-  // Real-time Static Entity Detection from current class skeleton
   const detectedEntities = useMemo(() => {
     const names: string[] = [];
     const classRegex = /(?:export\s+)?(?:abstract\s+)?class\s+([A-Za-z0-9_]+)/g;
@@ -134,7 +128,6 @@ export const App: React.FC = () => {
     return names;
   }, [classSkeleton]);
 
-  // Submit current attempt
   const handleSubmit = async () => {
     if (!attemptId) return;
 
@@ -160,7 +153,6 @@ export const App: React.FC = () => {
         setSubmissionStatus(json.data.status);
         setEvaluation(json.data.evaluation || null);
 
-        // Update default comparison versions
         if (json.data.version > 1) {
           setVersionA(json.data.version - 1);
           setVersionB(json.data.version);
@@ -177,7 +169,6 @@ export const App: React.FC = () => {
     }
   };
 
-  // Retry evaluation
   const handleRetry = async () => {
     if (!attemptId || currentVersion === 0) return;
     setIsEvaluating(true);
@@ -199,14 +190,11 @@ export const App: React.FC = () => {
     }
   };
 
-  // "Try Again" - Prepare next attempt
   const handleTryAgain = () => {
-    // Keep the current skeleton and rationale for editing, reset evaluation view
     setEvaluation(null);
     setSubmissionStatus(null);
   };
 
-  // Reset to clean starter template
   const handleResetTemplate = () => {
     if (problemDetail) {
       setClassSkeleton(problemDetail.starterTemplate.skeleton);
@@ -217,7 +205,6 @@ export const App: React.FC = () => {
     }
   };
 
-  // Fetch comparison report
   const handleOpenComparison = async () => {
     if (!attemptId || versionsList.length < 2) return;
     setIsComparisonOpen(true);

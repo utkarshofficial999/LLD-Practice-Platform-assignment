@@ -25,9 +25,6 @@ export interface ProgressionReport {
 }
 
 export class AttemptProgressionEngine {
-  /**
-   * Compares two evaluation results and computes an explainable progression delta.
-   */
   public static compare(prev: EvaluationResult, curr: EvaluationResult): ProgressionReport {
     const overallScoreDelta = curr.overallScore - prev.overallScore;
 
@@ -60,7 +57,6 @@ export class AttemptProgressionEngine {
       }
     }
 
-    // Structural differences
     const prevClasses = new Set(prev.deterministicFindings.detectedClasses);
     const currClasses = new Set(curr.deterministicFindings.detectedClasses);
     const classesAdded = [...currClasses].filter((c) => !prevClasses.has(c));

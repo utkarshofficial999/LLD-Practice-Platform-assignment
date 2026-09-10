@@ -12,7 +12,6 @@ export class CompositeEvaluator {
     if (strategies && strategies.length > 0) {
       this.strategies = strategies;
     } else {
-      // Default pipeline: Deterministic checks first, then AI qualitative judgment
       this.strategies = [
         new DeterministicEvaluator(),
         new AIEvaluator(process.env.GROQ_API_KEY, process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY),
@@ -20,16 +19,10 @@ export class CompositeEvaluator {
     }
   }
 
-  /**
-   * Adds a new evaluation strategy. Directly demonstrates Change Test B (e.g. human review or custom linters).
-   */
   public addStrategy(strategy: IEvaluationStrategy): void {
     this.strategies.push(strategy);
   }
 
-  /**
-   * Orchestrates the evaluation pipeline with timeout guard and fallback.
-   */
   public async evaluate(submission: Submission, problem: Problem): Promise<EvaluationResult> {
     let deterministicFindings: DeterministicFindings = {
       entityCoverage: [],
@@ -44,7 +37,6 @@ export class CompositeEvaluator {
 
     for (const strategy of this.strategies) {
       try {
-        // Enforce 10-second timeout per evaluation stage
         const stageResult = await Promise.race([
           strategy.evaluate(submission, problem),
           new Promise<never>((_, reject) =>
@@ -65,18 +57,15 @@ export class CompositeEvaluator {
       }
     }
 
-    // If AI failed or produced no assessments, synthesize fallback assessments from deterministic findings
     if (rubricAssessments.length === 0) {
       rubricAssessments = this.createFallbackRubric(deterministicFindings, problem);
       evaluationSource = 'fallback';
     }
 
-    // Compute overall score (0 to 100) based on average of 1-5 scale
     const totalScore = rubricAssessments.reduce((sum, a) => sum + a.score, 0);
     const maxScore = rubricAssessments.length * 5;
     const overallScore = Math.round((totalScore / maxScore) * 100);
 
-    // Extract top actionable improvement suggestions
     const actionableSummary: string[] = rubricAssessments
       .filter((a) => a.score < 5)
       .map((a) => `[${a.criterion}]: ${a.suggestion}`)

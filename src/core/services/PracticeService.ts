@@ -49,10 +49,6 @@ export class PracticeService {
     return attempt;
   }
 
-  /**
-   * Submits a design attempt with immediate persistence, state transitions,
-   * idempotency deduplication, and resilient evaluation execution.
-   */
   public async submitAttempt(
     attemptId: string,
     payload: SubmitPayload
@@ -60,33 +56,27 @@ export class PracticeService {
     const attempt = await this.getAttempt(attemptId);
     const problem = await this.getProblem(attempt.problemId);
 
-    // Compute or sanitize idempotency key
     const rawContent = `${payload.classSkeleton}::${payload.designRationale}`;
     const idempotencyKey = payload.idempotencyKey || Buffer.from(rawContent).toString('base64').slice(0, 32);
 
-    // Check for duplicate in-flight or completed submission with identical content
     const latestSub = attempt.getLatestSubmission();
     if (latestSub && latestSub.idempotencyKey === idempotencyKey && latestSub.status === 'COMPLETED') {
       const existingEval = attempt.getEvaluation(latestSub.version);
       return { submission: latestSub, evaluation: existingEval };
     }
 
-    // 1. Encapsulate content using ISubmissionContent strategy (Change Test A)
     const submissionContent: ISubmissionContent = new StructuredSubmissionContent(
       payload.classSkeleton,
       payload.designRationale,
       payload.diagramMermaid || ''
     );
 
-    // 2. Create submission and STORE BEFORE EVALUATION (Principle 10: Keep Scale Practical)
     const submission = attempt.createNextSubmission(submissionContent, idempotencyKey);
     await this.attemptRepo.save(attempt);
 
-    // 3. Transition state to EVALUATING
     submission.markEvaluating();
     await this.attemptRepo.save(attempt);
 
-    // 4. Run Evaluation Pipeline
     try {
       const evaluationResult = await this.evaluator.evaluate(submission, problem);
       attempt.recordEvaluation(submission.version, evaluationResult);
@@ -107,9 +97,6 @@ export class PracticeService {
     }
   }
 
-  /**
-   * Retries evaluation for a failed submission version.
-   */
   public async retryEvaluation(
     attemptId: string,
     version: number
@@ -141,9 +128,6 @@ export class PracticeService {
     }
   }
 
-  /**
-   * Compares two versions within an attempt to report progression deltas.
-   */
   public async compareAttemptVersions(
     attemptId: string,
     versionA: number,

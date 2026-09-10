@@ -20,10 +20,6 @@ export class Attempt {
     return this._evaluations;
   }
 
-  /**
-   * Safe creation of the next submission version.
-   * Enforces sequential versioning and stores before evaluation begins.
-   */
   public createNextSubmission(content: ISubmissionContent, idempotencyKey: string): Submission {
     this.currentVersion += 1;
     const submission = new Submission(
@@ -39,9 +35,6 @@ export class Attempt {
     return submission;
   }
 
-  /**
-   * Records evaluation result and marks the submission as COMPLETED.
-   */
   public recordEvaluation(version: number, result: EvaluationResult): void {
     const submission = this._submissions.find((s) => s.version === version);
     if (!submission) {
@@ -52,9 +45,6 @@ export class Attempt {
     this._evaluations.set(version, result);
   }
 
-  /**
-   * Records an evaluation failure and marks submission as FAILED.
-   */
   public recordFailure(version: number, errorDiagnostic: string): void {
     const submission = this._submissions.find((s) => s.version === version);
     if (submission) {

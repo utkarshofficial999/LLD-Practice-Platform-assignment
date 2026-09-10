@@ -62,7 +62,6 @@ export const ComparisonModal: React.FC<ComparisonModalProps> = ({
         </div>
 
         <div className="modal-body">
-          {/* Version selector */}
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>Base</span>
@@ -97,7 +96,6 @@ export const ComparisonModal: React.FC<ComparisonModalProps> = ({
 
           {report && (
             <>
-              {/* Score bar */}
               <div className="comparison-score-bar">
                 <div>
                   <div style={{ fontSize: '0.64rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>
@@ -114,7 +112,6 @@ export const ComparisonModal: React.FC<ComparisonModalProps> = ({
                 </span>
               </div>
 
-              {/* Resolved concerns */}
               {report.resolvedConcerns.length > 0 && (
                 <div style={{ marginBottom: '16px' }}>
                   <div className="section-heading" style={{ color: 'var(--success)' }}>
@@ -136,7 +133,6 @@ export const ComparisonModal: React.FC<ComparisonModalProps> = ({
                 </div>
               )}
 
-              {/* Structural changes */}
               <div style={{ marginBottom: '16px' }}>
                 <div className="section-heading">Structural Changes</div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
@@ -176,7 +172,6 @@ export const ComparisonModal: React.FC<ComparisonModalProps> = ({
                 </div>
               </div>
 
-              {/* Criteria delta table */}
               <div className="section-heading">Rubric Delta</div>
               <table className="comparison-table">
                 <thead>

@@ -157,7 +157,7 @@ describe('Evaluation Engine', () => {
 
     const diff = AttemptProgressionEngine.compare(evalAttempt1, evalAttempt2);
 
-    expect(diff.overallScoreDelta).toBe(30); // 80 - 50
+    expect(diff.overallScoreDelta).toBe(30);
     expect(diff.criteriaDeltas.find((c) => c.criterion.includes('SOLID'))?.status).toBe('improved');
     expect(diff.structuralProgress.classesAdded).toContain('Ticket');
     expect(diff.structuralProgress.interfacesAdded).toContain('IPaymentStrategy');

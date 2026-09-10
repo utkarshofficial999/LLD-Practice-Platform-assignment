@@ -31,9 +31,6 @@ export class Problem {
     public readonly starterTemplate: StarterTemplate
   ) {}
 
-  /**
-   * Deterministically verifies which required domain entities are present in detected classes/interfaces.
-   */
   public checkEntityCoverage(detectedEntities: string[]): EntityCoverageResult[] {
     const normalizedDetected = detectedEntities.map((e) => e.toLowerCase().replace(/[^a-z0-9]/g, ''));
 

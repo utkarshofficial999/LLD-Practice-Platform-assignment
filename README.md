@@ -1,30 +1,30 @@
-# LLD Practice Platform 🚀
-> A focused, domain-driven practice platform for Low-Level System Design (LLD) with hybrid deterministic static analysis and explainable AI rubric evaluation.
+# LLD Practice Platform
+> A domain-driven practice platform for Low-Level System Design (LLD) with hybrid deterministic static analysis and explainable AI rubric evaluation.
 
 ---
 
-## 📖 Table of Contents
-1. [Core Philosophy & Practice Loop](#-core-philosophy--practice-loop)
-2. [Domain Architecture (LLD Focus)](#-domain-architecture-lld-focus)
-3. [The Two Change Tests](#-the-two-change-tests)
-4. [Hybrid Evaluation Approach](#-hybrid-evaluation-approach)
-5. [Deliverables Overview](#-deliverables-overview)
-6. [Getting Started (Setup & Run)](#-getting-started-setup--run)
-7. [Running the Test Suite](#-running-the-test-suite)
-8. [Trade-offs & Engineering Decisions](#-trade-offs--engineering-decisions)
+## Table of Contents
+1. [Core Philosophy & Practice Loop](#core-philosophy--practice-loop)
+2. [Domain Architecture (LLD Focus)](#domain-architecture-lld-focus)
+3. [The Two Change Tests](#the-two-change-tests)
+4. [Hybrid Evaluation Approach](#hybrid-evaluation-approach)
+5. [Deliverables Overview](#deliverables-overview)
+6. [Getting Started (Setup & Run)](#getting-started-setup--run)
+7. [Running the Test Suite](#running-the-test-suite)
+8. [Trade-offs & Engineering Decisions](#trade-offs--engineering-decisions)
 
 ---
 
-## 🎯 Core Philosophy & Practice Loop
+## Core Philosophy & Practice Loop
 
 Low-Level Design practice is often easy to start but notoriously difficult to evaluate. Unlike algorithmic problems with binary pass/fail test cases, real-world object-oriented design is about **trade-offs, responsibility partitioning, and decoupled abstractions**.
 
-This platform delivers an intuitive, distraction-free practice experience centered on the iterative learning loop:
+This platform delivers a focused, distraction-free practice experience centered on the iterative learning loop:
 $$\text{Choose Problem} \longrightarrow \text{Think \& Model} \longrightarrow \text{Submit} \longrightarrow \text{Explainable Feedback} \longrightarrow \text{Review} \longrightarrow \text{Try Again (Attempt 2)}$$
 
 ---
 
-## 🏛 Domain Architecture (LLD Focus)
+## Domain Architecture (LLD Focus)
 
 The core domain layer (`src/core/domain/`) follows Clean Architecture with zero external framework coupling:
 
@@ -37,9 +37,9 @@ The core domain layer (`src/core/domain/`) follows Clean Architecture with zero 
 
 ---
 
-## 🧩 The Two Change Tests
+## The Two Change Tests
 
-Per the Candidate Helping Guide, our architecture explicitly aces both change tests:
+Per the Candidate Helping Guide, our architecture explicitly fulfills both change tests:
 
 ### Change Test A: New Submission Formats
 > *"Today the learner submits text/code. Later the platform supports a class diagram or JSON canvas. How much of your domain model changes?"*
@@ -53,7 +53,7 @@ Per the Candidate Helping Guide, our architecture explicitly aces both change te
 
 ---
 
-## 🔬 Hybrid Evaluation Approach
+## Hybrid Evaluation Approach
 
 | Evaluation Type | Engine | Responsibilities |
 |---|---|---|
@@ -63,17 +63,17 @@ Per the Candidate Helping Guide, our architecture explicitly aces both change te
 
 ---
 
-## 📂 Deliverables Overview
+## Deliverables Overview
 
-1. [RESEARCH_NOTE.md](file:///e:/LLD%20Practice%20Platform/RESEARCH_NOTE.md): Learner problem analysis, existing tool research (Educative, LeetCode, Mock interviews), key gaps, and product direction.
-2. [DESIGN_NOTE.md](file:///e:/LLD%20Practice%20Platform/DESIGN_NOTE.md): MVP architecture, domain model, class diagrams, change tests, evaluation division, and practical scaling.
-3. [AI_USAGE.md](file:///e:/LLD%20Practice%20Platform/AI_USAGE.md): 4 concrete AI-assisted engineering decisions: suggestions accepted vs rejected, and technical rationale.
-4. [Full Automated Test Suite](file:///e:/LLD%20Practice%20Platform/tests/): Vitest tests covering domain logic, Change Tests A & B, evaluators, anti-patterns, and progression deltas.
-5. **Interactive Working Prototype**: React + Express + Mermaid live diagramming + dark mode glassmorphic UI.
+1. [RESEARCH_NOTE.md](RESEARCH_NOTE.md): Learner problem analysis, existing tool research (Educative, LeetCode, Mock interviews), key gaps, and product direction.
+2. [DESIGN_NOTE.md](DESIGN_NOTE.md): MVP architecture, domain model, class diagrams, change tests, evaluation division, and practical scaling.
+3. [AI_USAGE.md](AI_USAGE.md): 4 concrete AI-assisted engineering decisions: suggestions accepted vs rejected, and technical rationale.
+4. [Full Automated Test Suite](tests/): Vitest tests covering domain logic, Change Tests A & B, evaluators, anti-patterns, and progression deltas.
+5. **Interactive Working Prototype**: React + Express + Mermaid live diagramming + dark and light mode UI.
 
 ---
 
-## 🚀 Getting Started (Setup & Run)
+## Getting Started (Setup & Run)
 
 ### Prerequisites
 - Node.js `v18+` (tested on Node `v24.11`)
@@ -93,12 +93,12 @@ npm install
 ```powershell
 npm run dev
 ```
-- **Web UI**: Open your browser at [http://localhost:5173](http://localhost:5173)
-- **API Server**: Running at `http://localhost:3001`
+- **Web UI**: Open your browser at http://localhost:5173
+- **API Server**: Running at http://localhost:3001
 
 ---
 
-## 🧪 Running the Test Suite
+## Running the Test Suite
 
 ```powershell
 npm test
@@ -111,8 +111,8 @@ Runs the full suite of Vitest unit and integration tests:
 
 ---
 
-## ⚖️ Trade-offs & Engineering Decisions
+## Trade-offs & Engineering Decisions
 
 1. **Modular Monolith over Microservices**: Built as a cohesive TypeScript monolith. Microservices would introduce network hops and serialization overhead without providing learner value.
-2. **Dual-Mode AI Engine**: Works 100% out-of-the-box using the local semantic reasoning engine with zero external API key requirements, while supporting live Gemini/OpenAI API keys when configured.
+2. **Dual-Mode AI Engine**: Works out-of-the-box using the local semantic reasoning engine with zero external API key requirements, while supporting live Gemini/OpenAI API keys when configured.
 3. **Structured Design Model over Sandboxed Execution**: Avoids tedious boilerplate and compilation errors, maximizing learner focus on object-oriented architecture and trade-offs.

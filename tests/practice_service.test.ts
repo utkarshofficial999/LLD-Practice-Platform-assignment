@@ -9,17 +9,14 @@ describe('PracticeService End-to-End Practice Loop', () => {
   const service = new PracticeService(problemRepo, attemptRepo);
 
   it('orchestrates complete practice loop: list -> start -> submit -> iterate -> compare', async () => {
-    // 1. List problems
     const problems = await service.listProblems();
     expect(problems.length).toBeGreaterThanOrEqual(3);
     const problem = problems[0];
 
-    // 2. Start attempt
     const attempt = await service.startAttempt(problem.id);
     expect(attempt.id).toBeTruthy();
     expect(attempt.currentVersion).toBe(0);
 
-    // 3. Submit Attempt 1 (Initial naive design)
     const result1 = await service.submitAttempt(attempt.id, {
       classSkeleton: `
         export class ParkingLot {
@@ -36,7 +33,6 @@ describe('PracticeService End-to-End Practice Loop', () => {
     expect(result1.evaluation).toBeDefined();
     const eval1Score = result1.evaluation!.overallScore;
 
-    // 4. Test Idempotency: submitting the exact same content returns existing completed submission
     const duplicateSubmission = await service.submitAttempt(attempt.id, {
       classSkeleton: `
         export class ParkingLot {
@@ -49,7 +45,6 @@ describe('PracticeService End-to-End Practice Loop', () => {
     });
     expect(duplicateSubmission.submission.version).toBe(1);
 
-    // 5. Submit Attempt 2 (Refactored design incorporating feedback)
     const result2 = await service.submitAttempt(attempt.id, {
       classSkeleton: `
         export interface IPaymentStrategy {
@@ -81,7 +76,6 @@ describe('PracticeService End-to-End Practice Loop', () => {
     expect(result2.submission.status).toBe('COMPLETED');
     expect(result2.evaluation!.overallScore).toBeGreaterThanOrEqual(eval1Score);
 
-    // 6. Compare Attempt 1 and Attempt 2
     const comparison = await service.compareAttemptVersions(attempt.id, 1, 2);
     expect(comparison.previousVersion).toBe(1);
     expect(comparison.currentVersion).toBe(2);

@@ -30,7 +30,6 @@ export const SubmissionStudio: React.FC<SubmissionStudioProps> = ({
 
   return (
     <div className="pane" id="studio-pane" style={{ borderRight: '1px solid var(--border)' }}>
-      {/* Tab bar */}
       <div className="studio-toolbar">
         <div className="tab-group">
           <button
@@ -66,7 +65,6 @@ export const SubmissionStudio: React.FC<SubmissionStudioProps> = ({
         </div>
       </div>
 
-      {/* Editor area */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {activeTab === 'code' && (
           <textarea
@@ -74,7 +72,7 @@ export const SubmissionStudio: React.FC<SubmissionStudioProps> = ({
             className="code-editor"
             value={classSkeleton}
             onChange={(e) => onChangeSkeleton(e.target.value)}
-            placeholder="// Model your classes, interfaces, and methods here..."
+            placeholder="Model your classes, interfaces, and methods here..."
             spellCheck={false}
           />
         )}
@@ -120,7 +118,6 @@ export const SubmissionStudio: React.FC<SubmissionStudioProps> = ({
         )}
       </div>
 
-      {/* Action bar */}
       <div className="studio-action-bar">
         <div className="action-status">
           {isEvaluating ? (

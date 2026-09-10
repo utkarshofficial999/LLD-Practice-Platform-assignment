@@ -46,7 +46,6 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   errorDiagnostic,
   onRetry,
 }) => {
-  // Error state
   if (submissionStatus === 'FAILED') {
     return (
       <div className="pane" id="feedback-pane">
@@ -97,7 +96,6 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
         )}
       </div>
 
-      {/* Pipeline */}
       <div className="pipeline">
         <div className={`pipeline-step ${submissionStatus ? 'completed' : ''}`}>
           <div className="pipeline-dot" />
@@ -121,7 +119,6 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       </div>
 
       <div className="pane-content">
-        {/* Empty state */}
         {!evaluation && !isEvaluating && (
           <div className="empty-state" style={{ paddingTop: 40 }}>
             <div className="empty-icon">
@@ -134,7 +131,6 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
           </div>
         )}
 
-        {/* Scanning state */}
         {isEvaluating && (
           <div className="scan-container">
             <div className="scan-spinner" />
@@ -145,7 +141,6 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
 
         {evaluation && (
           <>
-            {/* Score */}
             <div className="score-display">
               <div className="score-label">Design Quality</div>
               <div className="score-value">
@@ -156,7 +151,6 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
               </div>
             </div>
 
-            {/* Next attempt */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, padding: '0 4px' }}>
               <span style={{ fontSize: '0.68rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-dim)' }}>
                 Rubric Breakdown
@@ -166,7 +160,6 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
               </button>
             </div>
 
-            {/* Improvement priorities */}
             {evaluation.actionableSummary.length > 0 && (
               <ul className="priority-list">
                 <li style={{ fontSize: '0.64rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--accent-muted)', marginBottom: 2, display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -181,7 +174,6 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
               </ul>
             )}
 
-            {/* Anti-patterns */}
             {evaluation.deterministicFindings.antiPatternFlags.length > 0 && (
               <div style={{ marginBottom: 12 }}>
                 {evaluation.deterministicFindings.antiPatternFlags.map((flag, idx) => (
@@ -197,7 +189,6 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
               </div>
             )}
 
-            {/* Rubric metric cards */}
             <div>
               {evaluation.rubricAssessments.map((item, idx) => {
                 const barClass = getBarClass(item.score);

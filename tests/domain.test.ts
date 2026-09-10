@@ -24,7 +24,7 @@ describe('Domain Models', () => {
     expect(spotMatch?.matched).toBe(true);
 
     const vehicleMatch = coverage.find((c) => c.entity === 'Vehicle');
-    expect(vehicleMatch?.matched).toBe(true); // 'CompactVehicle' contains 'Vehicle'
+    expect(vehicleMatch?.matched).toBe(true);
 
     const paymentMatch = coverage.find((c) => c.entity === 'PaymentStrategy');
     expect(paymentMatch?.matched).toBe(false);

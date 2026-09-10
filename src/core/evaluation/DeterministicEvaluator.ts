@@ -10,25 +10,20 @@ export class DeterministicEvaluator implements IEvaluationStrategy {
     const structuralModel = submission.content.extractStructuralModel();
     const allClassesAndInterfaces = [...structuralModel.classes, ...structuralModel.interfaces];
 
-    // 1. Entity Coverage Matrix
     const entityCoverage = problem.checkEntityCoverage(allClassesAndInterfaces);
-
-    // 2. Anti-pattern detection
     const antiPatternFlags: AntiPatternFlag[] = [];
 
-    // Check for God Classes (classes with excessive methods)
     for (const [className, methods] of Object.entries(structuralModel.methodsByClass)) {
       if (methods.length >= 6) {
         antiPatternFlags.push({
           name: 'God Class Tendency',
           severity: 'warning',
-          details: `Class '${className}' has ${methods.length} methods (${methods.slice(0, 4).join(', ')}...). Consider decomposing into specialized strategy/service objects to adhere to Single Responsibility Principle.`,
+          details: `Class '${className}' has ${methods.length} methods (${methods.slice(0, 4).join(', ')}...). Consider decomposing into specialized strategy or service objects to adhere to Single Responsibility Principle.`,
           offendingElement: className,
         });
       }
     }
 
-    // Check for missing interfaces/abstractions
     if (structuralModel.classes.length >= 1 && structuralModel.interfaces.length === 0) {
       antiPatternFlags.push({
         name: 'Lack of Interface Abstraction',
@@ -37,7 +32,6 @@ export class DeterministicEvaluator implements IEvaluationStrategy {
       });
     }
 
-    // Check if missing critical core entities
     const missingEntities = entityCoverage.filter((e) => !e.matched).map((e) => e.entity);
     if (missingEntities.length > 0) {
       antiPatternFlags.push({

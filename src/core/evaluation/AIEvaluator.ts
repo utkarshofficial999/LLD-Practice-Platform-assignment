@@ -19,7 +19,6 @@ export class AIEvaluator implements IEvaluationStrategy {
     const rationale = submission.content.getRationale();
     const structuralModel = submission.content.extractStructuralModel();
 
-    // Try Groq API first (fast inference)
     if (this.groqApiKey) {
       try {
         const liveAssessments = await this.callGroqAPI(classSkeleton, rationale, problem);
@@ -35,7 +34,6 @@ export class AIEvaluator implements IEvaluationStrategy {
       }
     }
 
-    // Fallback: High-fidelity local semantic reasoning evaluator
     const assessments = this.evaluateLocally(classSkeleton, rationale, structuralModel, problem);
 
     return {
@@ -45,10 +43,6 @@ export class AIEvaluator implements IEvaluationStrategy {
     };
   }
 
-  /**
-   * Calls the Groq API with a structured rubric prompt.
-   * Uses Llama 3 model for fast, high-quality inference.
-   */
   private async callGroqAPI(
     classSkeleton: string,
     rationale: string,
@@ -122,12 +116,10 @@ Respond with ONLY the JSON array of 5 rubric assessments:`;
         throw new Error('Empty response from Groq API');
       }
 
-      // Parse the JSON response
       let parsed: any;
       try {
         parsed = JSON.parse(content);
       } catch {
-        // Try extracting JSON array from the response
         const arrayMatch = content.match(/\[[\s\S]*\]/);
         if (arrayMatch) {
           parsed = JSON.parse(arrayMatch[0]);
@@ -136,7 +128,6 @@ Respond with ONLY the JSON array of 5 rubric assessments:`;
         }
       }
 
-      // Handle both direct arrays and { assessments: [...] } shapes
       const assessments: RubricAssessment[] = Array.isArray(parsed)
         ? parsed
         : Array.isArray(parsed.assessments)
@@ -145,7 +136,6 @@ Respond with ONLY the JSON array of 5 rubric assessments:`;
         ? parsed.rubric_assessments
         : [];
 
-      // Validate and sanitize
       const validAssessments = assessments
         .filter(
           (a: any) =>
@@ -176,10 +166,6 @@ Respond with ONLY the JSON array of 5 rubric assessments:`;
     }
   }
 
-  /**
-   * Local deterministic semantic evaluator that inspects structural composition,
-   * keyword patterns, interfaces, and rationale depth to generate structured rubric ratings.
-   */
   private evaluateLocally(
     classSkeleton: string,
     rationale: string,
@@ -190,7 +176,6 @@ Respond with ONLY the JSON array of 5 rubric assessments:`;
     const lowerCode = classSkeleton.toLowerCase();
     const lowerRationale = rationale.toLowerCase();
 
-    // 1. Requirement Coverage & Domain Completeness
     const coverage = problem.checkEntityCoverage([...structuralModel.classes, ...structuralModel.interfaces]);
     const matchedCount = coverage.filter((c) => c.matched).length;
     const totalRequired = problem.requiredEntities.length;
@@ -224,7 +209,6 @@ Respond with ONLY the JSON array of 5 rubric assessments:`;
       confidence: 0.95,
     });
 
-    // 2. Single Responsibility & Cohesion (SRP)
     let srpScore = 4;
     let srpEvidence = `Found ${structuralModel.classes.length} classes and ${structuralModel.interfaces.length} interfaces.`;
     let srpConcern = 'Classes generally have clear boundaries.';
@@ -255,7 +239,6 @@ Respond with ONLY the JSON array of 5 rubric assessments:`;
       confidence: 0.9,
     });
 
-    // 3. Coupling & Abstraction (DIP / LSP / Interfaces)
     let couplingScore = 3;
     let couplingEvidence = `Found ${structuralModel.interfaces.length} interfaces and ${structuralModel.relationships.filter((r) => r.type === 'implements').length} interface implementations.`;
     let couplingConcern = '';
@@ -285,7 +268,6 @@ Respond with ONLY the JSON array of 5 rubric assessments:`;
       confidence: 0.92,
     });
 
-    // 4. Extensibility & Pattern Appropriateness
     const hasStrategy = lowerCode.includes('strategy') || lowerRationale.includes('strategy');
     const hasFactory = lowerCode.includes('factory') || lowerRationale.includes('factory');
     const hasObserver = lowerCode.includes('observer') || lowerCode.includes('listener') || lowerRationale.includes('observer');
@@ -325,7 +307,6 @@ Respond with ONLY the JSON array of 5 rubric assessments:`;
       confidence: 0.88,
     });
 
-    // 5. Quality of Reasoning & Trade-off Awareness
     const wordCount = rationale.trim().split(/\s+/).filter(Boolean).length;
     const mentionsConcurrency = lowerRationale.includes('concurren') || lowerRationale.includes('thread') || lowerRationale.includes('lock') || lowerRationale.includes('race');
     const mentionsTradeoffs = lowerRationale.includes('trade-off') || lowerRationale.includes('tradeoff') || lowerRationale.includes('versus') || lowerRationale.includes('chose') || lowerRationale.includes('alternative');

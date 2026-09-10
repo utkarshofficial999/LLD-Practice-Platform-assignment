@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import mermaid from 'mermaid';
+import { AlertCircle } from 'lucide-react';
 
 mermaid.initialize({
   startOnLoad: false,
@@ -49,7 +50,7 @@ export const MermaidViewer: React.FC<MermaidViewerProps> = ({ chart }) => {
         }
       } catch (err: any) {
         if (isMounted) {
-          setError('Invalid Mermaid syntax. Check class / relationship declarations.');
+          setError('Invalid Mermaid syntax. Check class or relationship declarations.');
         }
       }
     };
@@ -62,8 +63,8 @@ export const MermaidViewer: React.FC<MermaidViewerProps> = ({ chart }) => {
 
   if (error) {
     return (
-      <div style={{ color: 'var(--danger)', padding: '16px', fontSize: '0.75rem', fontFamily: 'var(--font-mono)' }}>
-        ⚠ {error}
+      <div style={{ color: 'var(--danger)', padding: '16px', fontSize: '0.75rem', fontFamily: 'var(--font-mono)', display: 'flex', alignItems: 'center', gap: 6 }}>
+        <AlertCircle size={14} /> {error}
       </div>
     );
   }

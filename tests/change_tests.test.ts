@@ -7,14 +7,6 @@ import { CompositeEvaluator } from '../src/core/evaluation/CompositeEvaluator.ts
 import { DeterministicEvaluator } from '../src/core/evaluation/DeterministicEvaluator.ts';
 
 describe('Candidate Helping Guide: The Two Change Tests', () => {
-  /**
-   * CHANGE TEST A:
-   * "Today the learner submits text. Later the platform supports a class diagram.
-   * How much of your domain model changes?"
-   *
-   * PROOF: We introduce a brand new DiagramSubmissionContent format.
-   * Neither Problem, Attempt, nor Evaluator needs any code modification.
-   */
   it('Change Test A: Can support a new Diagram format without changing domain entities', () => {
     class CustomDiagramSubmission implements ISubmissionContent {
       public readonly formatType = 'visual-canvas-json';
@@ -57,14 +49,6 @@ describe('Candidate Helping Guide: The Two Change Tests', () => {
     expect(model.interfaces).toContain('IPaymentStrategy');
   });
 
-  /**
-   * CHANGE TEST B:
-   * "Today feedback comes from one evaluator. Later you add a rule-based evaluator
-   * or human review. Can you add it without rewriting the practice flow?"
-   *
-   * PROOF: We introduce a HumanReviewEvaluator implementing IEvaluationStrategy
-   * and plug it into CompositeEvaluator. Zero changes to the practice flow!
-   */
   it('Change Test B: Can add a Human Review Evaluator without altering practice flow', async () => {
     class HumanReviewEvaluator implements IEvaluationStrategy {
       public readonly name = 'Senior Staff Human Review';

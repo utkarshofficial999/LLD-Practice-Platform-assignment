@@ -7,11 +7,6 @@ export interface StructuralModel {
   methodsByClass: Record<string, string[]>;
 }
 
-/**
- * Strategy interface representing the candidate's submission content.
- * Solves Change Test A: New submission formats (e.g. pure diagram, AST code, text)
- * simply implement this contract without modifying Problem, Attempt, or Evaluators.
- */
 export interface ISubmissionContent {
   readonly formatType: string;
   getRawContent(): string;
@@ -21,9 +16,6 @@ export interface ISubmissionContent {
   extractStructuralModel(): StructuralModel;
 }
 
-/**
- * Standard MVP implementation combining class skeleton, rationale, and mermaid diagram.
- */
 export class StructuredSubmissionContent implements ISubmissionContent {
   public readonly formatType = 'structured-code-and-rationale';
 
@@ -49,9 +41,6 @@ export class StructuredSubmissionContent implements ISubmissionContent {
     return this.diagramMermaid;
   }
 
-  /**
-   * Fast, reliable structural extraction for classes, interfaces, and methods.
-   */
   public extractStructuralModel(): StructuralModel {
     const classes: string[] = [];
     const interfaces: string[] = [];
@@ -60,7 +49,6 @@ export class StructuredSubmissionContent implements ISubmissionContent {
 
     const code = this.classSkeleton;
 
-    // Extract classes (including extends / implements)
     const classRegex = /(?:export\s+)?(?:abstract\s+)?class\s+([A-Za-z0-9_]+)(?:\s+extends\s+([A-Za-z0-9_]+))?(?:\s+implements\s+([A-Za-z0-9_,\s]+))?/g;
     let match: RegExpExecArray | null;
 
@@ -82,7 +70,6 @@ export class StructuredSubmissionContent implements ISubmissionContent {
       }
     }
 
-    // Extract interfaces (including extends)
     const interfaceRegex = /(?:export\s+)?interface\s+([A-Za-z0-9_]+)(?:\s+extends\s+([A-Za-z0-9_,\s]+))?/g;
     while ((match = interfaceRegex.exec(code)) !== null) {
       const ifaceName = match[1];
@@ -99,12 +86,10 @@ export class StructuredSubmissionContent implements ISubmissionContent {
       }
     }
 
-    // Extract method signatures
     const methodRegex = /(?:public|private|protected|async)?\s*([a-zA-Z0-9_]+)\s*\([^)]*\)\s*:\s*([a-zA-Z0-9_<>[\]]+)/g;
     while ((match = methodRegex.exec(code)) !== null) {
       const methodName = match[1];
       if (!['if', 'for', 'while', 'switch', 'catch', 'function', 'constructor'].includes(methodName)) {
-        // assign to last discovered class if any
         const lastClass = classes[classes.length - 1] || interfaces[interfaces.length - 1];
         if (lastClass && methodsByClass[lastClass]) {
           methodsByClass[lastClass].push(methodName);

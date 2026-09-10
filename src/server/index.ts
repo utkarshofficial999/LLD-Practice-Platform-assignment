@@ -13,14 +13,10 @@ const port = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
-// Initialize repositories and core practice service
 const problemRepo = new InMemoryProblemRepository();
 const attemptRepo = new InMemoryAttemptRepository();
 const practiceService = new PracticeService(problemRepo, attemptRepo);
 
-/**
- * GET /api/problems - List all available LLD practice problems
- */
 app.get('/api/problems', async (_req: Request, res: Response) => {
   try {
     const problems = await practiceService.listProblems();
@@ -40,9 +36,6 @@ app.get('/api/problems', async (_req: Request, res: Response) => {
   }
 });
 
-/**
- * GET /api/problems/:id - Fetch full problem details with starter templates and rubric
- */
 app.get('/api/problems/:id', async (req: Request, res: Response) => {
   try {
     const problem = await practiceService.getProblem(req.params.id as string);
@@ -52,9 +45,6 @@ app.get('/api/problems/:id', async (req: Request, res: Response) => {
   }
 });
 
-/**
- * POST /api/attempts - Start a new attempt for a problem
- */
 app.post('/api/attempts', async (req: Request, res: Response) => {
   try {
     const { problemId } = req.body;
@@ -78,9 +68,6 @@ app.post('/api/attempts', async (req: Request, res: Response) => {
   }
 });
 
-/**
- * GET /api/attempts/:id - Get attempt status, submissions, and evaluations
- */
 app.get('/api/attempts/:id', async (req: Request, res: Response) => {
   try {
     const attempt = await practiceService.getAttempt(req.params.id as string);
@@ -111,9 +98,6 @@ app.get('/api/attempts/:id', async (req: Request, res: Response) => {
   }
 });
 
-/**
- * POST /api/attempts/:id/submit - Submit a design iteration for evaluation
- */
 app.post('/api/attempts/:id/submit', async (req: Request, res: Response) => {
   try {
     const { classSkeleton, designRationale, diagramMermaid, idempotencyKey } = req.body;
@@ -147,9 +131,6 @@ app.post('/api/attempts/:id/submit', async (req: Request, res: Response) => {
   }
 });
 
-/**
- * POST /api/attempts/:id/retry - Retry a failed evaluation version
- */
 app.post('/api/attempts/:id/retry', async (req: Request, res: Response) => {
   try {
     const { version } = req.body;
@@ -167,9 +148,6 @@ app.post('/api/attempts/:id/retry', async (req: Request, res: Response) => {
   }
 });
 
-/**
- * GET /api/attempts/:id/compare - Compare two attempt versions
- */
 app.get('/api/attempts/:id/compare', async (req: Request, res: Response) => {
   try {
     const versionA = parseInt(req.query.versionA as string, 10);
@@ -188,5 +166,5 @@ app.get('/api/attempts/:id/compare', async (req: Request, res: Response) => {
 });
 
 app.listen(port, () => {
-  console.log(`🚀 LLD Practice Platform API server running at http://localhost:${port}`);
+  console.log(`LLD Practice Platform API server running at http://localhost:${port}`);
 });
