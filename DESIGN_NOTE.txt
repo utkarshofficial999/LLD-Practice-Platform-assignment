@@ -1,0 +1,171 @@
+================================================================================
+                         DESIGN NOTE: LLD PRACTICE PLATFORM
+                     ARCHITECTURE, DOMAIN MODEL & TRADE-OFFS
+================================================================================
+
+1. SYSTEM OVERVIEW & MVP SCOPE
+--------------------------------------------------------------------------------
+The LLD Practice Platform is a domain-driven application engineered to support
+an iterative practice experience for software engineers preparing for Low-Level
+Design interviews and real-world system modeling.
+
+Core MVP Capabilities:
+1. Curated Problem Catalog: Realistic scenarios with required domain concepts,
+   behavioral expectations, starter templates, and rubric criteria.
+2. Three-Panel Studio Workspace:
+   - Left Panel: Problem specification, requirements checklist, domain entities.
+   - Center Panel: Multi-tab editor (TypeScript Code Skeleton, Live Interactive
+     UML Class Diagram via Mermaid, and Design Rationale / Assumptions).
+   - Right Panel: Explainable rubric evaluation scorecard, progression diffs,
+     and anti-pattern diagnostics.
+3. Hybrid Evaluation Engine:
+   - Deterministic Analyzer: Entity coverage matrix, God-class flags, missing
+     interface abstraction warnings.
+   - AI Architectural Judgment: Evidence-cited rubric assessments (1 to 5).
+4. Multi-Attempt Progression:
+   - Version tracking (v1 -> v2) with side-by-side progression report
+     highlighting resolved concerns and score improvements.
+
+
+2. CORE USER FLOW
+--------------------------------------------------------------------------------
+[1. Choose Problem]
+     |
+     v
+[2. Model Skeleton & Rationale in Studio]
+     |
+     v
+[3. Live UML Diagram Inspection]
+     |
+     v
+[4. Submit Attempt (Idempotent Lifecycle)]
+     |
+     v
+[5. Hybrid Evaluation Pipeline (Deterministic Rules + AI Rubric)]
+     |
+     v
+[6. Inspect Scorecard & Recommendations]
+     |
+     v
+[7. Refactor Code & Rationale -> Submit Version 2]
+     |
+     v
+[8. Version Comparison Report (v1 vs v2 Diff & Resolved Concerns)]
+
+
+3. KEY CLASSES & INTERFACES (DOMAIN MODEL)
+--------------------------------------------------------------------------------
+The architecture strictly enforces Clean Architecture and SOLID principles:
+
+1. Problem (`src/core/domain/Problem.ts`):
+   - Represents an LLD challenge.
+   - Properties: id, title, difficulty, description, requiredEntities,
+     keyExpectations, rubric, starterTemplate.
+   - Methods: checkEntityCoverage(detectedEntities): EntityCoverageResult[]
+
+2. Attempt (`src/core/domain/Attempt.ts` - Aggregate Root):
+   - Manages a continuous learning session for a specific problem.
+   - Properties: id, problemId, startedAt, currentVersion, submissions, evaluations.
+   - Methods:
+     * createNextSubmission(content, idempotencyKey): Submission
+     * attachEvaluation(version, evaluation): void
+     * getEvaluation(version): EvaluationResult | undefined
+     * getLatestSubmission(): Submission | undefined
+
+3. Submission (`src/core/domain/Submission.ts` - Entity):
+   - Represents a single snapshot of learner design.
+   - Properties: id, version, idempotencyKey, submittedAt, status
+     ('SUBMITTED' | 'EVALUATING' | 'COMPLETED' | 'FAILED'), content.
+   - Methods: markEvaluating(), markCompleted(), markFailed(diagnostic).
+
+4. ISubmissionContent (`src/core/domain/Submission.ts` - Strategy Pattern):
+   - Decouples submission formats from the core model.
+   - Methods:
+     * getClassSkeleton(): string
+     * getRationale(): string
+     * getDiagramMermaid(): string
+     * extractStructuralModel(): StructuralModel
+
+5. IEvaluationStrategy (`src/core/evaluation/IEvaluationStrategy.ts`):
+   - Interface for all evaluators.
+   - Methods: evaluate(submission, problem): Promise<StageEvaluationResult>
+
+6. CompositeEvaluator (`src/core/evaluation/CompositeEvaluator.ts`):
+   - Composite pattern running multiple evaluators in parallel or sequence.
+   - Orchestrates DeterministicEvaluator and AIEvaluator into a unified
+     EvaluationResult with overall score and anti-pattern flags.
+
+7. PracticeService (`src/core/services/PracticeService.ts`):
+   - Application service orchestrating the full end-to-end loop:
+     listProblems(), getProblem(), startAttempt(), submitAttempt(),
+     retryEvaluation(), compareAttemptVersions().
+
+8. AttemptProgressionEngine (`src/core/evaluation/AttemptProgressionEngine.ts`):
+   - Compares Attempt v1 and v2, generating a structured ProgressionReport
+     with score delta, resolved concerns, and newly introduced issues.
+
+
+4. THE TWO ARCHITECTURAL CHANGE TESTS
+--------------------------------------------------------------------------------
+CHANGE TEST A: NEW SUBMISSION FORMATS
+- Prompt: "Today the learner submits text/code. Later the platform supports a
+  class diagram or JSON canvas. How much of your domain model changes?"
+- Result: ZERO CHANGES to Problem, Attempt, or Evaluators.
+- Implementation: Submission relies on the ISubmissionContent interface.
+  Adding a JSON Canvas submission format only requires creating a class
+  implementing ISubmissionContent. Tested in `tests/change_tests.test.ts`.
+
+CHANGE TEST B: NEW EVALUATION STRATEGIES
+- Prompt: "Today feedback comes from one evaluator. Later you add a rule-based
+  evaluator or human review. Can you add it without rewriting the flow?"
+- Result: ZERO CHANGES to PracticeService or Attempt.
+- Implementation: CompositeEvaluator implements open-closed extensibility.
+  Adding a new evaluator is as simple as calling:
+  `composite.addStrategy(new HumanReviewEvaluator())`.
+  Tested in `tests/change_tests.test.ts`.
+
+
+5. EVALUATION APPROACH (HYBRID PIPELINE)
+--------------------------------------------------------------------------------
+1. Deterministic Analysis:
+   - Extracts classes, interfaces, and methods using structural parser.
+   - Verifies presence of mandatory domain concepts (e.g. ParkingSpot, Ticket).
+   - Detects concrete anti-patterns:
+     * God Class Tendency: Class has >= 6 methods (violates SRP).
+     * Missing Abstractions: Classes present without interfaces (violates DIP).
+     * Missing Domain Entities: Flags specific missing entities with severity.
+
+2. AI Architectural Rubric Evaluation:
+   - Evaluates 5 core criteria:
+     1. Requirement Coverage (Weight: 25%)
+     2. Single Responsibility & Cohesion (Weight: 20%)
+     3. Coupling & Abstraction Depth (Weight: 25%)
+     4. Extensibility & Pattern Appropriateness (Weight: 15%)
+     5. Trade-off Reasoning & Assumptions (Weight: 15%)
+   - For every criterion, outputs: Score (1-5), Evidence citation from code,
+     Identified concerns, and Actionable suggestions.
+   - Runs live via Groq LLM API with fallback to local heuristic evaluation.
+
+
+6. KEY ENGINEERING TRADE-OFFS & DECISIONS
+--------------------------------------------------------------------------------
+1. Hybrid vs. Pure AI Evaluation:
+   - Trade-off: Pure AI can hallucinate or be inconsistent across calls. Pure
+     static analysis cannot evaluate subtle design rationale.
+   - Decision: Combine deterministic rules (hard entity checklist, anti-patterns)
+     with anchored LLM rubrics for objective, evidence-based feedback.
+
+2. In-Memory Repository with Universal Fallback:
+   - Trade-off: External databases require connection setup, credentials, and
+     migrations that can fail during assessment demos.
+   - Decision: Built with clean repository interfaces (IProblemRepository,
+     IAttemptRepository). In-memory implementation runs both in Node and directly
+     in the browser as an automatic fallback, guaranteeing 100% uptime.
+
+3. Structured Design Model vs. Full Runnable Code:
+   - Trade-off: Requiring full executable code forces learners to waste 80% of
+     their time debugging syntax, imports, and boilerplate.
+   - Decision: Focus on class skeletons, interfaces, and design rationales,
+     which is exactly what is expected in real-world architectural design and
+     senior engineering interviews.
+================================================================================

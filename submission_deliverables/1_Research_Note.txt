@@ -1,0 +1,137 @@
+================================================================================
+                       RESEARCH NOTE: LOW-LEVEL DESIGN (LLD)
+                          PRACTICE & EVALUATION PLATFORM
+================================================================================
+
+1. THE LEARNER PROBLEM: WHY LLD PRACTICE IS HARD
+--------------------------------------------------------------------------------
+Low-Level Design (LLD) is one of the most critical stages in a software
+engineer's transition from writing functional code to authoring scalable,
+maintainable, and extensible software systems. Yet, practicing LLD today remains
+extraordinarily frustrating and inefficient for self-directed learners.
+
+Through our analysis of the learning journey, four foundational obstacles emerge:
+
+1.1 THE ABSENCE OF AN AUTOMATED FEEDBACK LOOP
+In Data Structures and Algorithms (DSA), platforms like LeetCode provide an
+immediate, deterministic truth: code passes test cases or it fails. The feedback
+loop is instantaneous. In LLD, there are rarely binary test cases because
+DESIGN IS FUNDAMENTALLY ABOUT TRADE-OFFS. A learner can spend three hours
+designing a Parking Lot system or an Elevator Dispatcher, write dozens of classes,
+and still have no idea whether their abstractions are decoupled, their
+responsibilities are coherent, or their solution suffers from design smells like
+God Objects or tight coupling.
+
+1.2 THE "MULTIPLE VALID DESIGNS" DILEMMA
+Unlike algorithmic problem solving where time/space complexity can objectively
+rank solutions, two completely different LLD solutions can both be valid
+depending on the operating constraints and assumptions:
+- An Elevator system can use a simple scan algorithm (LOOK/SCAN) with a single
+  controller, or a decentralized multi-car dispatch agent network with state-
+  machine delegates.
+- If a practice platform simply provides a static "Reference Solution",
+  learners mistakenly conclude their different approach was "wrong", or worse,
+  blindly memorize one specific pattern rather than developing architectural
+  reasoning.
+
+1.3 THE FRICTION OF SUBMISSION MODALITIES
+Learners struggle with what to submit:
+- Full executable code: Demands tedious boilerplate (getters, setters,
+  serialization, syntax minutiae) that distracts from structural design.
+- Unstructured plain text: Too ambiguous to evaluate objectively; learners write
+  hand-wavy descriptions without committing to concrete class boundaries or
+  relationships.
+- Pure visual diagrams: Time-consuming to draw in external tools (Draw.io or
+  Lucidchart) and hard to parse semantically for automated review.
+
+1.4 LACK OF ITERATIVE IMPROVEMENT TRACKING
+Real-world software design is iterative: you produce a draft, review trade-offs,
+identify edge cases, and refactor. Existing practice resources are one-off
+consumption media (reading a blog post or watching a video). They provide no
+mechanism for a learner to see: "Here is Attempt 1, here is where my coupling was
+tight, and here is how my Attempt 2 improved abstraction and resolved concerns."
+
+
+2. RESEARCH INTO EXISTING TOOLS & APPROACHES
+--------------------------------------------------------------------------------
+We analyzed the primary methods learners currently use to prepare for LLD:
+
++-----------------------------+-----------------------+-------------------------+-------------------------------+
+| Practice Medium / Tool      | Workflow & Submission | Evaluation & Feedback   | Critical Gaps                 |
++-----------------------------+-----------------------+-------------------------+-------------------------------+
+| Educative / Grokking LLD    | Read text + view      | No evaluation. Passive  | Zero interactive practice.    |
+|                             | pre-made diagrams +   | reading only.           | Learner cannot test their own |
+|                             | copy Java code.       |                         | original design ideas.        |
++-----------------------------+-----------------------+-------------------------+-------------------------------+
+| GitHub Repositories         | Clone repo, read      | None (self-comparison   | No validation of whether the  |
+| (e.g., awesome-lld)         | community code of     | against someone else's  | community code is actually    |
+|                             | Parking Lot, etc.     | arbitrary code).        | good or fits constraints.     |
++-----------------------------+-----------------------+-------------------------+-------------------------------+
+| LeetCode / HackerRank OOP   | Write runnable code   | Unit tests pass/fail.   | Evaluates runtime execution   |
+| (Design Underground System) | implementing an       |                         | correctness, NOT design       |
+|                             | interface.            |                         | quality. A God Class with     |
+|                             |                       |                         | 1,000 lines passes all tests. |
++-----------------------------+-----------------------+-------------------------+-------------------------------+
+| Paid Mock Interviews        | Verbal discussion +   | High-quality human      | Extremely expensive ($150 to  |
+| (Pramp, Interviewing.io)    | collaborative Doc or  | feedback on trade-offs. | $300/hr), unscalable,         |
+|                             | Coderpad.             |                         | scheduling friction, and      |
+|                             |                       |                         | inconsistent rubrics.         |
++-----------------------------+-----------------------+-------------------------+-------------------------------+
+| Generic AI Chatbots         | Pastes prompt:        | Generic praise or       | Unstructured, unrepeatable,   |
+| (ChatGPT / Claude Web)      | "Critique my Parking  | unanchored critique;    | hallucinated scores, and zero |
+|                             | Lot design".          | lack of rubrics.        | attempt progression tracking. |
++-----------------------------+-----------------------+-------------------------+-------------------------------+
+
+
+3. KEY GAPS IDENTIFIED
+--------------------------------------------------------------------------------
+1. GAP 1: DISCONNECT BETWEEN CODE AND ARCHITECTURAL INTENT
+   Tools either grade raw compilation/tests (LeetCode) or provide static text
+   (Educative). There is no tool that evaluates architectural relationships and
+   design trade-offs together with stated assumptions.
+
+2. GAP 2: SUBJECTIVE, UNANCHORED FEEDBACK
+   Generic AI feedback says "looks good, but you could add a Factory Pattern"
+   without citing specific code evidence or explaining why that pattern is
+   warranted for the learner's specific constraints.
+
+3. GAP 3: MISSING STATE & PROGRESSION RETENTION
+   Platforms treat submissions as ephemeral. Learners never get a diff of their
+   design competence over time or concrete validation that their second version
+   fixed the flaws of their first version.
+
+
+4. PRODUCT DIRECTION & MVP HYPOTHESIS
+--------------------------------------------------------------------------------
+4.1 THE CORE LEARNER LOOP
+We design our platform around a focused, non-distracting practice loop:
+   Choose Problem -> Think & Structure -> Submit -> Explainable Feedback
+   -> Review -> Refactor & Try Again (Version 2)
+
+4.2 THE SUBMISSION SWEET SPOT: "STRUCTURED DESIGN MODEL"
+To provide deep evidence of design quality without forcing learners to write
+500 lines of boilerplate, we require:
+1. Class & Interface Skeleton: Clear class declarations, interfaces, fields,
+   method signatures, and access levels (proves encapsulation, coupling,
+   and abstraction boundaries).
+2. Design Rationale & Assumptions: Explicit statement of chosen patterns,
+   concurrency assumptions, and trade-off justifications (proves architectural
+   reasoning).
+3. Live Diagram Generation: Automatic or learner-provided Mermaid diagram
+   rendering to visually inspect relationships.
+
+4.3 HYBRID EVIDENCE-BASED EVALUATION
+We reject arbitrary 0-100 scores. Instead, we introduce a Fixed Rubric Model:
+- Deterministic Rules Engine: Analyzes structural requirements (required domain
+  concepts present vs missing, inheritance depth, God-class detection, interface
+  segregation).
+- AI Judgment Engine: Evaluates qualitative dimensions (cohesion, trade-off depth,
+  pattern appropriateness) anchored to strict structured output:
+  Criterion -> Score (1-5) -> Evidence Citation -> Specific Concern
+  -> Actionable Suggestion -> Confidence Rating.
+
+4.4 MULTI-ATTEMPT COMPARISON ENGINE
+Every attempt belongs to an evolving learner session. Attempt 2 explicitly
+highlights what changed compared to Attempt 1, which previous concerns were
+resolved, and whether new architectural flaws were introduced.
+================================================================================

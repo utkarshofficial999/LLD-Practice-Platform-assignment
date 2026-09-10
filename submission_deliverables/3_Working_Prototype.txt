@@ -1,0 +1,106 @@
+================================================================================
+                    WORKING PROTOTYPE: LLD PRACTICE PLATFORM
+                         END-TO-END DEMO & ACCESS GUIDE
+================================================================================
+
+1. LIVE PROTOTYPE ACCESS
+--------------------------------------------------------------------------------
+- Live Production URL (Vercel):
+  https://lld-practice-platform-git-main-utkarshs-projects-5d161d13.vercel.app
+
+- GitHub Source Repository:
+  https://github.com/utkarshofficial999/LLD-Practice-Platform-assignment
+
+- Tech Stack:
+  * Frontend: React 19, TypeScript, Vite, Mermaid.js, Lucide Icons, Pure CSS
+  * Backend: Express 4, TypeScript (tsx), Vercel Serverless Functions
+  * Testing: Vitest (9 automated tests covering domain, loop, and change tests)
+  * AI Layer: Groq API (llama-3.3-70b-versatile) with heuristic local fallback
+
+
+2. STEP-BY-STEP END-TO-END PRACTICE FLOW
+--------------------------------------------------------------------------------
+Follow this walkthrough to experience the complete learner journey:
+
+STEP 1: PROBLEM SELECTION & SPECIFICATION REVIEW
+1. Open the Live URL.
+2. In the top navigation bar, use the Problem Dropdown to switch between:
+   - "Design a Multi-Floor Parking Lot System" (Medium)
+   - "Design a High-Rise Elevator Dispatching System" (Hard)
+3. The Left Specification Panel immediately populates with:
+   - Domain Scenario description
+   - Required Domain Entities checklist (with live detection status badges)
+   - Key Behavioral Expectations & Concurrency requirements
+   - Official Rubric Criteria & weights
+
+STEP 2: MODELING IN THE STUDIO WORKSPACE
+1. Center Panel contains three synchronized views:
+   - [<> Code] Tab: Multi-line TypeScript skeleton editor with starter template.
+   - [UML] Tab: Interactive, live-rendered Mermaid Class Diagram visualizing
+     classes, interfaces, and relationships.
+   - [Rationale] Tab: Structured design decisions and concurrency assumptions.
+2. Notice as you type in the Code tab, the left panel's "Domain Entities" checklist
+   dynamically updates in real-time to show detected vs missing entities.
+
+STEP 3: HYBRID EVALUATION (VERSION 1 SUBMISSION)
+1. Click the "Run Evaluation" button at the bottom right.
+2. The submission enters the evaluation lifecycle:
+   SUBMITTED -> EVALUATING -> COMPLETED.
+3. The Right Panel (AI Architect) presents the comprehensive Scorecard:
+   - Overall Quality Score (e.g. 8.0/10) with Production Readiness indicator.
+   - Static Analysis Findings: Domain entity coverage and anti-pattern flags
+     (e.g., God Class warnings, missing interfaces).
+   - 5-Criteria Rubric Assessment:
+     * Requirement Coverage (1-5) + exact evidence quote from submission
+     * Single Responsibility & Cohesion (1-5) + specific concern
+     * Coupling & Abstraction Depth (1-5) + actionable improvement
+     * Extensibility & Patterns (1-5)
+     * Trade-off Reasoning & Assumptions (1-5)
+
+STEP 4: REFACTORING & ITERATING (VERSION 2 SUBMISSION)
+1. In the Code tab, modify the design (e.g. add a new interface or decompose
+   a class) and refine the Rationale tab.
+2. Click "Run Evaluation" again.
+3. The submission is versioned automatically (v1 -> v2).
+4. The system evaluates the updated design and updates the version badge to "v2".
+
+STEP 5: ATTEMPT COMPARISON & PROGRESSION REPORT
+1. Once two versions exist, the "Compare (v1 vs v2)" button in the header activates.
+2. Click "Compare (v1 vs v2)" to open the Version Comparison Modal.
+3. Inspect the side-by-side progression:
+   - Overall score delta (+/- points)
+   - Resolved architectural concerns from Version 1
+   - Newly flagged issues or regressions
+   - Criterion-by-criterion delta breakdown
+
+
+3. ADDITIONAL PLATFORM CAPABILITIES
+--------------------------------------------------------------------------------
+- Theme Toggle: Switch between Dark Mode ("Night") and Light Mode ("Day") with
+  persistent localStorage theme retention.
+- Reset Template: One-click restore to original problem starter templates.
+- Resilient Offline / Serverless Mode: If network latency occurs, the embedded
+  in-browser client service takes over transparently, ensuring 100% uptime.
+
+
+4. HOW TO RUN LOCALLY
+--------------------------------------------------------------------------------
+Prerequisites: Node.js (v18+) and npm
+
+1. Clone repository:
+   git clone https://github.com/utkarshofficial999/LLD-Practice-Platform-assignment.git
+   cd LLD-Practice-Platform-assignment
+
+2. Install dependencies:
+   npm install
+
+3. Configure Environment (.env):
+   Create a `.env` file in the project root:
+   GROQ_API_KEY=your_groq_api_key_here
+
+4. Start both Server & Client concurrently:
+   npm run dev
+
+5. Open browser:
+   http://localhost:5173
+================================================================================
